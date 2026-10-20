@@ -28,6 +28,14 @@ const xirrGuard = (get: (l: Loan) => number | null) => (l: Loan) =>
 
 const XIRR_GUARD_NOTE = 'Loans held ≥30 days; annualised outliers beyond ±300% excluded';
 
+/**
+ * NPA loans report a negative, unbounded "ANR" — it is a write-off, not a
+ * return. Charts that plot ANR keep the performing book only, otherwise a
+ * single -600% default compresses the whole axis.
+ */
+const performingAnr = (l: Loan) => l.npa !== 1 && l.reportedAnr !== null;
+const ANR_GUARD_NOTE = 'NPA loans excluded — their reported ANR is a write-off, not a return';
+
 function baseKpis(rows: Loan[], ctx: ViewContext): Kpi[] {
   const t = aggregate(rows, ctx.scenario, ctx.meta.recoveryRate);
   return [
@@ -358,7 +366,7 @@ const returns: PageConfig = {
     K.scenarioProfitBars({ id: 'ret-scenarios', title: 'Scenario profit', section: 'Definitions' }),
     K.waterfallProfit({ id: 'ret-waterfall', title: 'Where profit comes from', section: 'Definitions' }),
     K.percentileChart({ id: 'ret-percentiles', title: 'ANR percentiles', section: 'Definitions' }),
-    K.histField({ id: 'ret-anr-hist', title: 'Reported ANR distribution', section: 'Definitions', label: 'ANR %', get: (l) => l.reportedAnr, kind: 'percent', color: COLORS.emerald }),
+    K.histField({ id: 'ret-anr-hist', title: 'Reported ANR distribution', section: 'Definitions', label: 'ANR %', subtitle: ANR_GUARD_NOTE, filter: performingAnr, get: (l) => l.reportedAnr, kind: 'percent', color: COLORS.emerald }),
     K.xirrSpread({ id: 'ret-xirr-hist', title: 'Loan-level XIRR distribution', section: 'Definitions' }),
     K.histField({ id: 'ret-profit-hist', title: 'Net profit per loan', section: 'Definitions', label: 'Net profit (₹)', get: (l) => l.netProfit, kind: 'money', color: COLORS.cyan }),
     K.histField({ id: 'ret-roi-hist', title: 'Simple ROI per loan', section: 'Definitions', label: 'Profit / invested %', get: (l) => (l.amount ? (l.netProfit / l.amount) * 100 : null), kind: 'percent', color: COLORS.amber }),
@@ -390,7 +398,7 @@ const returns: PageConfig = {
     K.histField({ id: 'ret-xirr-consult', title: 'Contractual XIRR distribution', section: 'Loan-level returns', label: 'XIRR %', subtitle: XIRR_GUARD_NOTE, filter: xirrGuard((l) => l.xirrContractual), get: (l) => l.xirrContractual, kind: 'percent', color: COLORS.cyan }),
     K.histField({ id: 'ret-xirr-recovery', title: 'Recovery-case XIRR distribution', section: 'Loan-level returns', label: 'XIRR %', subtitle: XIRR_GUARD_NOTE, filter: xirrGuard((l) => l.xirrRecovery), get: (l) => l.xirrRecovery, kind: 'percent', color: COLORS.emerald }),
     K.histField({ id: 'ret-xirr-strict', title: 'Strict-case XIRR distribution', section: 'Loan-level returns', label: 'XIRR %', subtitle: XIRR_GUARD_NOTE, filter: xirrGuard((l) => l.xirrStrict), get: (l) => l.xirrStrict, kind: 'percent', color: COLORS.rose }),
-    K.boxDim({ id: 'ret-box-grade', title: 'ANR spread by grade', section: 'Loan-level returns', dim: 'grade', label: 'ANR %', get: (l) => l.reportedAnr }),
+    K.boxDim({ id: 'ret-box-grade', title: 'ANR spread by grade', section: 'Loan-level returns', dim: 'grade', label: 'ANR %', subtitle: ANR_GUARD_NOTE, filter: performingAnr, get: (l) => l.reportedAnr }),
     K.boxDim({ id: 'ret-box-tenure', title: 'XIRR spread by tenure', section: 'Loan-level returns', dim: 'tenure', label: 'XIRR %', subtitle: XIRR_GUARD_NOTE, filter: xirrGuard((l) => l.xirrRecovery), get: (l) => l.xirrRecovery }),
     ...dimBars('ret', 'Return drivers', 'grade', ['anr', 'xirr', 'profit', 'lent']),
     ...dimBars('ret', 'Return drivers', 'tenure', ['anr', 'xirr', 'prepay', 'profit']),
@@ -399,9 +407,9 @@ const returns: PageConfig = {
     ...dimBars('ret', 'Return drivers', 'cityTier', ['anr', 'xirr', 'npaRate', 'ticket']),
     ...dimBars('ret', 'Return drivers', 'state', ['xirr', 'anr', 'lent']),
     ...dimBars('ret', 'Return drivers', 'amountBand', ['anr', 'xirr', 'profit', 'npaRate']),
-    K.monthlyLine({ id: 'ret-monthly-anr', title: 'Monthly average ANR', section: 'Return drivers', metric: 'avgAnr' }),
+    K.monthlyLine({ id: 'ret-monthly-anr', title: 'Monthly median ANR', section: 'Return drivers', metric: 'avgAnr' }),
     K.roiTimeline({ id: 'ret-monthly-xirr', title: 'Cohort XIRR', section: 'Return drivers' }),
-    K.monthlyCombo({ id: 'ret-volume-yield', title: 'Deployment against ANR', section: 'Return drivers', bar: 'lent', line: 'avgAnr' }),
+    K.monthlyCombo({ id: 'ret-volume-yield', title: 'Deployment against median ANR', section: 'Return drivers', bar: 'lent', line: 'avgAnr' }),
     K.scatterXY({
       id: 'ret-scatter-tenure-xirr',
       title: 'Tenure against XIRR',
@@ -418,20 +426,24 @@ const returns: PageConfig = {
       id: 'ret-scatter-score-anr',
       title: 'Score against ANR',
       section: 'Loan-level returns',
+      subtitle: ANR_GUARD_NOTE,
       xLabel: 'LDC score',
       yLabel: 'ANR %',
       xGet: (l) => l.score,
       yGet: (l) => l.reportedAnr,
+      filter: performingAnr,
       yKind: 'percent',
     }),
     K.scatterXY({
       id: 'ret-scatter-amount-anr',
       title: 'Ticket size against ANR',
       section: 'Loan-level returns',
+      subtitle: ANR_GUARD_NOTE,
       xLabel: 'Invested (₹)',
       yLabel: 'ANR %',
       xGet: (l) => l.amount,
       yGet: (l) => l.reportedAnr,
+      filter: performingAnr,
       xKind: 'money',
       yKind: 'percent',
     }),
@@ -439,7 +451,7 @@ const returns: PageConfig = {
     K.feeChart({ id: 'ret-fees', title: 'Fees against interest', section: 'Cash back' }),
     K.monthlyLine({ id: 'ret-monthly-received', title: 'Monthly cash received', section: 'Cash back', metric: 'received' }),
     K.dimLine({ id: 'ret-tenure-xirr-line', title: 'XIRR across tenure', section: 'Return drivers', dim: 'tenure', metric: 'xirr', area: true }),
-    K.dimLine({ id: 'ret-tenure-anr-line', title: 'ANR across tenure', section: 'Return drivers', dim: 'tenure', metric: 'anr', area: true }),
+    K.dimLine({ id: 'ret-tenure-anr-line', title: 'Median ANR across tenure', section: 'Return drivers', dim: 'tenure', metric: 'anr', area: true }),
   ]),
 };
 
@@ -804,7 +816,7 @@ const tenure: PageConfig = {
       yName: 'Grade',
     }),
     K.boxDim({ id: 'ten-box-rate', title: 'APR spread by tenure', section: 'Tenure risk', dim: 'tenure', label: 'APR %', get: (l) => l.rate }),
-    K.boxDim({ id: 'ten-box-anr', title: 'ANR spread by tenure', section: 'Tenure risk', dim: 'tenure', label: 'ANR %', get: (l) => l.reportedAnr }),
+    K.boxDim({ id: 'ten-box-anr', title: 'ANR spread by tenure', section: 'Tenure risk', dim: 'tenure', label: 'ANR %', subtitle: ANR_GUARD_NOTE, filter: performingAnr, get: (l) => l.reportedAnr }),
     K.scatterXY({
       id: 'ten-scatter-xirr',
       title: 'Tenure against XIRR',
@@ -966,13 +978,13 @@ const cohorts: PageConfig = {
     K.monthlyLine({ id: 'coh-count', title: 'Loan count by cohort', section: 'Cohort quality', metric: 'n' }),
     K.monthlyLine({ id: 'coh-lent', title: 'Capital by cohort', section: 'Cohort quality', metric: 'lent' }),
     K.monthlyLine({ id: 'coh-ticket', title: 'Average ticket by cohort', section: 'Cohort quality', metric: 'avgTicket' }),
-    K.monthlyLine({ id: 'coh-anr', title: 'ANR by cohort', section: 'Seasoning', metric: 'avgAnr' }),
+    K.monthlyLine({ id: 'coh-anr', title: 'Median ANR by cohort', section: 'Seasoning', metric: 'avgAnr' }),
     K.monthlyLine({ id: 'coh-profit', title: 'Profit by cohort', section: 'Cohort quality', metric: 'profit' }),
     K.monthlyLine({ id: 'coh-received', title: 'Cash received by cohort', section: 'Cohort quality', metric: 'received' }),
     K.roiTimeline({ id: 'coh-xirr', title: 'XIRR by cohort', section: 'Seasoning' }),
     K.monthlyNpaStack({ id: 'coh-stack', title: 'Outcome composition by cohort', section: 'Seasoning' }),
     K.monthlyCombo({ id: 'coh-volume-bad', title: 'Volume against impairment', section: 'Cohort quality', bar: 'lent', line: 'badRate' }),
-    K.monthlyCombo({ id: 'coh-volume-anr', title: 'Volume against ANR', section: 'Cohort quality', bar: 'lent', line: 'avgAnr' }),
+    K.monthlyCombo({ id: 'coh-volume-anr', title: 'Volume against median ANR', section: 'Cohort quality', bar: 'lent', line: 'avgAnr' }),
     K.cumulativeChart({ id: 'coh-cumulative', title: 'Cumulative deployment and recovery', section: 'Seasoning' }),
     K.dimLine({ id: 'coh-month-line', title: 'NPA across cohort months', section: 'Seasoning', dim: 'month', metric: 'npaRate', area: true }),
     K.dimLine({ id: 'coh-month-count', title: 'Loan count across cohort months', section: 'Cohort quality', dim: 'month', metric: 'n' }),
@@ -1291,8 +1303,8 @@ const methodology: PageConfig = {
     K.monthlyNpaStack({ id: 'meth-npa-stack', title: 'Monthly outcome composition', section: 'Money flow' }),
     K.cumulativeChart({ id: 'meth-cumulative', title: 'Cumulative cash flow', section: 'Money flow' }),
     K.roiTimeline({ id: 'meth-roi', title: 'Cohort XIRR', section: 'Return validation' }),
-    K.histField({ id: 'meth-anr-hist', title: 'Reported ANR distribution', section: 'Return validation', label: 'Reported ANR %', get: (l) => l.reportedAnr, kind: 'percent' }),
-    K.ecdfField({ id: 'meth-anr-ecdf', title: 'Cumulative ANR curve', section: 'Return validation', label: 'Reported ANR %', get: (l) => l.reportedAnr, kind: 'percent' }),
+    K.histField({ id: 'meth-anr-hist', title: 'Reported ANR distribution', section: 'Return validation', label: 'Reported ANR %', subtitle: ANR_GUARD_NOTE, filter: performingAnr, get: (l) => l.reportedAnr, kind: 'percent' }),
+    K.ecdfField({ id: 'meth-anr-ecdf', title: 'Cumulative ANR curve', section: 'Return validation', label: 'Reported ANR %', subtitle: ANR_GUARD_NOTE, filter: performingAnr, get: (l) => l.reportedAnr, kind: 'percent' }),
     K.xirrSpread({ id: 'meth-xirr-spread', title: 'Loan-level XIRR spread', section: 'Return validation' }),
     K.forwardFan({ id: 'meth-forward', title: 'Forward projection fan', section: 'Forward view' }),
     K.monteCarloChart({ id: 'meth-monte-carlo', title: 'Monte Carlo profit distribution', section: 'Forward view' }),

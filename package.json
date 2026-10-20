@@ -10,6 +10,7 @@
     "charts:count": "rolldown scripts/chart-count.mjs --format esm --platform node -d .tmp && node .tmp/chart-count.js",
     "charts:dupes": "rolldown scripts/chart-dupes.mjs --format esm --platform node -d .tmp && node .tmp/chart-dupes.js",
     "charts:smoke": "rolldown scripts/chart-smoke.mjs --format esm --platform node -d .tmp && node .tmp/chart-smoke.js",
+    "charts:audit": "rolldown scripts/percent-audit.mjs --format esm --platform node -d .tmp && node .tmp/percent-audit.js",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",

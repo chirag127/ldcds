@@ -66,12 +66,18 @@ export function rankInsight(points: RankedPoint[], opts: RankOptions): Insight {
   const bestText = fmtVal(best.value, opts.kind);
   const worstText = fmtVal(worst.value, opts.kind);
   const tone: Insight['tone'] = gap === 0 ? 'neutral' : opts.higherIsBetter ? 'positive' : 'warning';
+  // Gap in points for rates, absolute otherwise; the relative multiple is only
+  // meaningful when both sides share a sign and the ratio is readable.
+  const gapText = opts.kind === 'percent' ? `${gap.toFixed(1)} points` : fmtVal(gap, opts.kind);
+  const sameSign = best.value !== 0 && worst.value !== 0 && Math.sign(best.value) === Math.sign(worst.value);
+  const ratio = sameSign ? Math.abs(best.value / worst.value) : null;
+  const ratioText = ratio !== null && ratio >= 1.05 && ratio <= 20 ? `, ${ratio.toFixed(1)}× the weaker group` : '';
   return {
     tone,
     headline: `${best.label} leads on ${opts.metric} at ${bestText}`,
     detail:
-      `${best.label} (${num(best.n)} loans) beats ${worst.label} (${num(worst.n)} loans) by ` +
-      `${fmtVal(gap, opts.kind)} on ${opts.metric}, a ${worst.value ? `${((gap / Math.abs(worst.value)) * 100).toFixed(0)}% ` : ''}spread. ` +
+      `${best.label} (${num(best.n)} loans) beats ${worst.label} (${num(worst.n)} loans, ${worstText}) by ` +
+      `${gapText} on ${opts.metric}${ratioText}. ` +
       (opts.higherIsBetter
         ? `Prefer ${best.label.toLowerCase()}; treat ${worst.label.toLowerCase()} as the drag.`
         : `Prefer ${best.label.toLowerCase()}; avoid or reprice ${worst.label.toLowerCase()}.`),
@@ -119,15 +125,20 @@ export function trendInsight(
   const trough = paired.reduce((a, b) => (b.v < a.v ? b : a));
   const delta = last.v - first.v;
   const improving = higherIsBetter ? delta >= 0 : delta <= 0;
+  // Money series have no natural direction of travel — a bigger average ticket
+  // is neither good nor bad on its own, so do not grade it.
+  const judged = kind !== 'money';
   return {
-    tone: improving ? 'positive' : 'negative',
+    tone: !judged ? 'neutral' : improving ? 'positive' : 'negative',
     headline: `${label} ${delta >= 0 ? 'rose' : 'fell'} from ${fmtVal(first.v, kind)} to ${fmtVal(last.v, kind)}`,
     detail:
       `Peak ${fmtVal(peak.v, kind)} in ${peak.label}, trough ${fmtVal(trough.v, kind)} in ${trough.label}. ` +
-      (improving
-        ? 'Direction of travel is favourable; the latest cohorts are not deteriorating.'
-        : 'Direction of travel is adverse — tighten the front book before the trend compounds.'),
-    action: improving ? 'PREFER' : 'WATCH',
+      (!judged
+        ? 'Read the level, not the direction — pair it with the quality series before acting.'
+        : improving
+          ? 'Direction of travel is favourable; the latest cohorts are not deteriorating.'
+          : 'Direction of travel is adverse — tighten the front book before the trend compounds.'),
+    action: !judged ? 'INFO' : improving ? 'PREFER' : 'WATCH',
   };
 }
 

@@ -1392,7 +1392,7 @@ export function comboOption({
   bars: { name: string; data: number[]; color?: string }[];
   lines: { name: string; data: number[]; color?: string; yAxisIndex?: number }[];
   barFormat?: 'money' | 'num';
-  lineFormat?: 'percent' | 'num';
+  lineFormat?: 'money' | 'percent' | 'num';
 }): ChartOption {
   const base = baseOption();
   return {
@@ -1403,7 +1403,7 @@ export function comboOption({
     xAxis: axisX({ data: categories }),
     yAxis: [
       axisY({ axisLabel: { color: MUTED, fontSize: 9, formatter: (v: number) => (barFormat === 'money' ? inrCompact(v) : num(v)) } }),
-      axisY({ axisLabel: { color: MUTED, fontSize: 9, formatter: (v: number) => (lineFormat === 'percent' ? `${v}%` : num(v)) }, splitLine: { show: false } }),
+      axisY({ axisLabel: { color: MUTED, fontSize: 9, formatter: (v: number) => (lineFormat === 'money' ? inrCompact(v) : lineFormat === 'percent' ? `${v}%` : num(v)) }, splitLine: { show: false } }),
     ],
     series: [
       ...bars.map((b) => ({

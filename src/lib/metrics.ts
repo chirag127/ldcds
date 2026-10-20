@@ -622,6 +622,7 @@ export interface MonthStat {
   badRate: number;
   npaRate: number;
   avgAnr: number;
+  medianAnr: number;
   avgTicket: number;
   xirr: number | null;
 }
@@ -651,6 +652,7 @@ export function monthlyStats(rows: Loan[], scenario: Scenario, diagnostics = fal
       badRate: group.length ? round((bad.length / group.length) * 100, 2) : 0,
       npaRate: closed.length ? round((npa.length / closed.length) * 100, 2) : 0,
       avgAnr: anr.length ? round(mean(anr, (v) => v), 2) : 0,
+      medianAnr: anr.length ? round(median(anr), 2) : 0,
       avgTicket: group.length ? round(sum(group, (l) => l.amount) / group.length, 2) : 0,
       xirr: diagnostics ? portfolioXirr(group, scenario) : null,
     });
@@ -674,11 +676,14 @@ export function cohortMatrix(rows: Loan[], metric: 'npaRate' | 'badRate' | 'avgA
       if (!group.length) continue;
       const closed = group.filter(isClosed);
       const npa = group.filter(isNpa);
-      const anr = closed.map((l) => l.reportedAnr).filter((v): v is number => Number.isFinite(v));
+      const anr = closed
+        .filter((l) => l.npa !== 1)
+        .map((l) => l.reportedAnr)
+        .filter((v): v is number => Number.isFinite(v));
       let value = 0;
       if (metric === 'npaRate') value = closed.length ? (npa.length / closed.length) * 100 : 0;
       else if (metric === 'badRate') value = (npa.length / group.length) * 100;
-      else if (metric === 'avgAnr') value = anr.length ? mean(anr, (v) => v) : 0;
+      else if (metric === 'avgAnr') value = anr.length ? median(anr) : 0;
       else if (metric === 'lent') value = sum(group, (l) => l.amount);
       else value = group.length;
       max = Math.max(max, value);

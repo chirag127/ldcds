@@ -69,7 +69,7 @@ export const METRICS: Record<string, MetricDef> = {
   loss: { label: 'expected loss', kind: 'money', higherIsBetter: false, get: (s) => s.loss, risk: true },
   npaRate: { label: 'NPA rate', kind: 'percent', higherIsBetter: false, get: (s) => s.npaRate, risk: true },
   badRate: { label: 'impairment rate', kind: 'percent', higherIsBetter: false, get: (s) => s.badRate, risk: true },
-  anr: { label: 'reported ANR', kind: 'percent', higherIsBetter: true, get: (s) => s.avgAnr },
+  anr: { label: 'median reported ANR', kind: 'percent', higherIsBetter: true, get: (s) => s.medianAnr },
   // categoryStats/portfolioXirr already return percent, so don't treat as a ratio.
   xirr: { label: 'money-weighted XIRR', kind: 'percent', higherIsBetter: true, get: (s) => s.xirr ?? 0 },
   ticket: { label: 'average ticket', kind: 'money', higherIsBetter: true, get: (s) => s.avgTicket },
@@ -181,7 +181,7 @@ export function dimBar(o: DimBarOptions): ChartSpec {
                 { key: 'n', label: 'Loans', align: 'right', type: 'int' },
                 { key: 'lent', label: 'Invested', align: 'right', type: 'money' },
                 { key: 'npaRate', label: 'NPA %', align: 'right', type: 'percent' },
-                { key: 'avgAnr', label: 'ANR %', align: 'right', type: 'percent' },
+                { key: 'medianAnr', label: 'ANR % (median)', align: 'right', type: 'percent' },
                 { key: 'xirr', label: 'XIRR', align: 'right', type: 'percent' },
               ],
               rows: stats.map((s) => ({
@@ -189,7 +189,7 @@ export function dimBar(o: DimBarOptions): ChartSpec {
                 n: s.n,
                 lent: s.lent,
                 npaRate: s.npaRate,
-                avgAnr: s.avgAnr,
+                medianAnr: s.medianAnr,
                 xirr: s.xirr,
               })),
             }
@@ -467,13 +467,15 @@ export function ecdfField(o: {
   subtitle?: string;
   color?: string;
   span?: 1 | 2;
+  filter?: (loan: Loan) => boolean;
 }): ChartSpec {
   return chart(
     o.id,
     o.title,
     o.section,
     (rows): ChartResult => {
-      const values = numericSeries(rows, o.get).sort((a, b) => a - b);
+      const source = o.filter ? rows.filter(o.filter) : rows;
+      const values = numericSeries(source, o.get).sort((a, b) => a - b);
       const points = values.length
         ? values.filter((_, i) => i % Math.max(1, Math.floor(values.length / 160)) === 0).map((v, i) => ({ x: v, y: (i * Math.max(1, Math.floor(values.length / 160)) + 1) / values.length }))
         : [];
@@ -611,7 +613,7 @@ export const MONTH_METRICS: Record<string, MonthMetric> = {
   netProfit: { label: 'realised profit', kind: 'money', higherIsBetter: true, get: (m) => m.netProfit },
   npaRate: { label: 'NPA rate', kind: 'percent', higherIsBetter: false, get: (m) => m.npaRate },
   badRate: { label: 'impairment rate', kind: 'percent', higherIsBetter: false, get: (m) => m.badRate },
-  avgAnr: { label: 'reported ANR', kind: 'percent', higherIsBetter: true, get: (m) => m.avgAnr },
+  avgAnr: { label: 'median reported ANR', kind: 'percent', higherIsBetter: true, get: (m) => m.medianAnr },
   avgTicket: { label: 'average ticket', kind: 'money', higherIsBetter: true, get: (m) => m.avgTicket },
   pos: { label: 'principal outstanding', kind: 'money', higherIsBetter: true, get: (m) => m.pos },
   received: { label: 'cash received', kind: 'money', higherIsBetter: true, get: (m) => m.received },
@@ -678,11 +680,11 @@ export function monthlyCombo(o: {
         bars: [{ name: barMeta.label, data: bars, color: COLORS.cyan }],
         lines: [{ name: lineMeta.label, data: lines, color: COLORS.rose }],
         barFormat: barMeta.kind === 'money' ? 'money' : 'num',
-        lineFormat: 'percent',
+        lineFormat: lineMeta.kind === 'money' ? 'money' : lineMeta.kind === 'num' ? 'num' : 'percent',
       });
       return {
         option,
-        insight: trendInsight(labels, lines, lineMeta.label, 'percent', lineMeta.higherIsBetter),
+        insight: trendInsight(labels, lines, lineMeta.label, lineMeta.kind, lineMeta.higherIsBetter),
       };
     },
     { subtitle: o.subtitle ?? 'Volume against quality by cohort month', span: o.span ?? 2, height: o.height ?? 280 },
@@ -1544,7 +1546,7 @@ export function percentileChart(o: { id: string; title: string; section: string;
     o.title,
     o.section,
     (rows): ChartResult => {
-      const sample = rows.filter(isClosed);
+      const sample = rows.filter(isClosed).filter((l) => l.npa !== 1);
       const values = sample.map((l) => l.reportedAnr ?? NaN).filter(Number.isFinite);
       const qs = [5, 10, 25, 50, 75, 90, 95];
       const data = qs.map((q) => round(percentile(values, q), 2));
@@ -1555,17 +1557,18 @@ export function percentileChart(o: { id: string; title: string; section: string;
         showLegend: false,
         label: true,
       });
+      const avg = values.length ? mean(values, (v) => v) : 0;
       return {
         option,
         insight: plain(
           'neutral',
           `Closed-loan ANR runs from ${pct(data[0])} at p5 to ${pct(data[data.length - 1])} at p95`,
-          `The median is ${pct(data[3])}. A short right tail from prepayment fees pulls the mean above the median, which is exactly why the naive average looks better than the cash-flow reality.`,
+          `The median performing loan returned ${pct(data[3])} and the mean ${pct(avg)}. Defaulted loans are excluded here — they report a write-off, not a return — so this curve is the performing book only.`,
           'INFO',
         ),
       };
     },
-    { subtitle: 'Percentiles of realised annualised return', span: o.span ?? 1, height: 280 },
+    { subtitle: 'Percentiles of realised annualised return, performing loans only', span: o.span ?? 1, height: 280 },
   );
 }
 

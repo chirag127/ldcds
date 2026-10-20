@@ -81,6 +81,21 @@ Returns tab: the platform annualises the whole closed book over capital-time,
 while per-loan annualisation inflates short-tenure loans that prepay early.
 Four definitions are shown side by side instead of picking one.
 
+### Unit conventions
+
+| Quantity | Stored as | Display rule |
+| --- | --- | --- |
+| XIRR (loan level and group) | percent | already ×100 — never multiply again |
+| ANR, NPA rate, impairment rate | percent | already ×100 |
+| Recovery rate, loss severity | ratio 0–1 | multiply on display |
+| Money | rupees | — |
+
+`toDisplay()` and `fmtVal()` multiply only `ratio` values. A metric tagged
+`ratio` that actually holds percent values is the exact defect that printed
+"4596% XIRR", so `npm run charts:audit` fails the build when any card shows a
+percentage above 400% or an XIRR above 1500%. ANR charts exclude NPA loans:
+their reported ANR is a write-off (as low as -600%), not a return.
+
 ### Scenarios
 
 | Scenario | Treatment of impaired active loans |
@@ -104,6 +119,7 @@ npm run data:build   # rebuild public/data from data/raw (requires raw exports)
 npm run charts:count # per-tab chart inventory (expect 488)
 npm run charts:dupes # duplicate chart id check
 npm run charts:smoke # build all 488 charts × 3 scenarios headlessly
+npm run charts:audit # fail on implausible percentages (unit-bug guard)
 ```
 
 Node 22+ is required by the build pipeline. The scraper itself is a plain
@@ -145,6 +161,7 @@ scripts/
   chart-count.mjs         per-tab chart inventory
   chart-dupes.mjs         duplicate chart id check
   chart-smoke.mjs         headless build of every chart × scenario
+  percent-audit.mjs       fails on implausible percentages in any card
 public/
   data/*.json             published dataset
   downloader/             scraper + instructions

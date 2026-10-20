@@ -74,7 +74,7 @@ export function Explorer({ page }: { page: PageConfig }) {
         repayLabel: LABELS.repay(l),
         stayLabel: LABELS.stay(l),
         xirrRecovery: l.xirrRecovery === null ? null : (l.xirrRecovery as number),
-        xirrContractual: l.xirrContractual === null ? null : (l.xirrContractual as number) * 100,
+        xirrContractual: l.xirrContractual === null ? null : (l.xirrContractual as number),
         xirrStrict: l.xirrStrict === null ? null : (l.xirrStrict as number),
       })),
     };
