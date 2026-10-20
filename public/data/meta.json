@@ -1,0 +1,987 @@
+{
+  "schemaVersion": 3,
+  "generatedAt": "2026-10-20T16:25:17.062Z",
+  "asOf": "2026-10-20",
+  "source": "LenDenClub manual lending export (v5/v6 APIs)",
+  "recoveryRate": 0.45,
+  "lgd": 0.55,
+  "counts": {
+    "loans": 5567,
+    "active": 2633,
+    "closed": 2934,
+    "npa": 234,
+    "overdueActive": 144,
+    "impaired": 378,
+    "borrowers": 5421,
+    "repeatBorrowers": 135,
+    "repeatLoans": 221,
+    "cities": 2684,
+    "states": 21,
+    "months": 11,
+    "schemes": 2860,
+    "columns": 69
+  },
+  "totals": {
+    "lent": 3314000,
+    "pos": 796111,
+    "received": 2708823.05,
+    "principalReceived": 2414229.02,
+    "interestReceived": 294611.85,
+    "fee": 53811.7,
+    "npaAmount": 103661.54,
+    "netProfit": 190940.32,
+    "activeExpectedReturns": 1416514.02,
+    "activeFutureInterest": 131792.93
+  },
+  "returnMethods": {
+    "officialClosedAnr": 16.1,
+    "officialClosedAbsolute": 5.87,
+    "officialClosedXirr": "0%",
+    "officialClosedLent": 2097000,
+    "officialClosedInterest": 226868.02,
+    "officialClosedNpa": 103661.54,
+    "officialClosedFee": 41788.67,
+    "recomputed": {
+      "closedLent": 2097000,
+      "closedProfit": 123206.95,
+      "closedAbsolutePct": 5.88,
+      "closedAvgHoldingDays": 88,
+      "closedCapitalTimeAnnualPct": 24.36,
+      "closedPortfolioXirr": 26.83,
+      "closedNaiveMeanAnr": 23.59,
+      "closedMedianAnr": 36.45,
+      "closedCount": 2934,
+      "closedNpaCount": 234,
+      "closedNpaRateByCount": 7.98,
+      "closedNpaRateByValue": 4.94,
+      "closedRecoveryRate": 0.4471
+    },
+    "active": {
+      "pos": 796111,
+      "realisedInterest": 67733.37,
+      "futureInterest": 131792.93,
+      "contractualProfit": 191550.47,
+      "recoveryProfit": 128304.19,
+      "strictProfit": 90075.96,
+      "portfolioXirrContractual": 54.5,
+      "portfolioXirrRecovery": 35.24,
+      "portfolioXirrStrict": 24.16
+    },
+    "whyTheyDiffer": [
+      "Loan-level ANR annualises each loan independently and ignores capital idle time, sequencing and the fact that 80% of closed loans prepaid early.",
+      "The platform ANR uses total closed-book profit over total lent with its own capital-time convention.",
+      "Capital-time annualisation uses actual holding days, so early prepayments lift it above the platform ANR.",
+      "XIRR is money-weighted and very sensitive to repayment timing; the export has no instalment dates, so closed-loan inflows are dated at closure."
+    ]
+  },
+  "scenarios": {
+    "contractual": {
+      "scenario": "contractual",
+      "totalLent": 3314000,
+      "realisedProfit": 190940.32,
+      "projectedProfit": 314757.42,
+      "futureProfit": 123817.1,
+      "totalReceived": 2708823.05,
+      "pos": 796111,
+      "expectedLoss": 103661.54,
+      "portfolioXirr": 37.9,
+      "roiPct": 9.5,
+      "activeCount": 2633,
+      "closedCount": 2934,
+      "npaCount": 234,
+      "impairedCount": 378,
+      "impairedPos": 188613.18,
+      "overdueActiveCount": 144,
+      "overdueActivePos": 84951.64
+    },
+    "recovery": {
+      "scenario": "recovery",
+      "totalLent": 3314000,
+      "realisedProfit": 190940.32,
+      "projectedProfit": 251511.14,
+      "futureProfit": 60570.82,
+      "totalReceived": 2708823.05,
+      "pos": 796111,
+      "expectedLoss": 150384.94,
+      "portfolioXirr": 30.31,
+      "roiPct": 7.59,
+      "activeCount": 2633,
+      "closedCount": 2934,
+      "npaCount": 234,
+      "impairedCount": 378,
+      "impairedPos": 188613.18,
+      "overdueActiveCount": 144,
+      "overdueActivePos": 84951.64
+    },
+    "strict": {
+      "scenario": "strict",
+      "totalLent": 3314000,
+      "realisedProfit": 190940.32,
+      "projectedProfit": 213282.91,
+      "futureProfit": 22342.59,
+      "totalReceived": 2708823.05,
+      "pos": 796111,
+      "expectedLoss": 188613.18,
+      "portfolioXirr": 25.7,
+      "roiPct": 6.44,
+      "activeCount": 2633,
+      "closedCount": 2934,
+      "npaCount": 234,
+      "impairedCount": 378,
+      "impairedPos": 188613.18,
+      "overdueActiveCount": 144,
+      "overdueActivePos": 84951.64
+    }
+  },
+  "officialPortfolio": {
+    "open": {
+      "expected_returns": 0,
+      "total_lent_amount": 1217000,
+      "principal_due": null,
+      "total_recieved_amount": 488616.1,
+      "fee_deducted": 12023.03,
+      "pos": 796111,
+      "total_earned": null,
+      "principal_receivable": null,
+      "portfolio_health": "Coming Soon",
+      "principal_received": 420889.01,
+      "principle_received": 420889.01,
+      "net_interest_received": 67727.1,
+      "total_npa_amount": 0
+    },
+    "closed": {
+      "xirr": "0%",
+      "total_fee_amount": 41788.67,
+      "total_npa_amount": 103661.54,
+      "total_lent_amount": 2097000,
+      "principal_received": 1993340.01,
+      "principle_received": 1993340.01,
+      "annualized_net_return": 16.1,
+      "net_interest_received": 226868.02,
+      "absolute_return": 5.87,
+      "total_received_amount": 2220206.95,
+      "portfolio_health": "Coming Soon",
+      "health_label": "Great",
+      "health_graph_data": {
+        "health_message": "You're doing well!",
+        "health_description": "Your strategy is working. Keep the momentum going, and share the opportunity with others.",
+        "user_anr": 16.1,
+        "coordinates": {
+          "x-axis": 16.1,
+          "y-axis": 16.1
+        }
+      }
+    }
+  },
+  "dataQuality": {
+    "missingIncome": 1912,
+    "missingBureau": 4,
+    "missingCity": 547,
+    "missingState": 3860,
+    "missingStay": 4432,
+    "missingPurpose": 5567,
+    "missingMarital": 5567,
+    "zeroAmount": 0,
+    "duplicateIds": 0,
+    "closureBeforeDisb": 0,
+    "maturityBeforeDisb": 0,
+    "pastMaturityStillActive": 20,
+    "incomeZeroShare": 0.3435,
+    "bureauZeroShare": 0.0007,
+    "cityCoverage": 0.9017,
+    "stateCoverage": 0.3066
+  },
+  "dictionaries": {
+    "status": [
+      "Active",
+      "Closed",
+      "NPA"
+    ],
+    "grade": [
+      "A (High)",
+      "AA (Medium)",
+      "AAA (Low)"
+    ],
+    "gender": [
+      "Male",
+      "Female",
+      "Other",
+      "Unknown"
+    ],
+    "profession": [
+      "Salaried",
+      "Self-employed"
+    ],
+    "stay": [
+      "Unknown",
+      "Self-owned",
+      "Rented"
+    ],
+    "repay": [
+      "Monthly EMI",
+      "Daily EDI"
+    ],
+    "listType": [
+      "Open",
+      "Closed"
+    ],
+    "dpdBucket": [
+      "0 DPD",
+      "1–30 DPD",
+      "31–60 DPD",
+      "61–90 DPD",
+      "90+ DPD"
+    ],
+    "cityTier": [
+      "Unknown",
+      "Tier 1 metro",
+      "Tier 2 city",
+      "Tier 3 / other"
+    ],
+    "scenario": [
+      "Contractual",
+      "Recovery (45%)",
+      "Strict write-off"
+    ]
+  },
+  "columns": [
+    {
+      "key": "id",
+      "label": "Loan ID",
+      "type": "id",
+      "description": "LenDenClub loan identifier"
+    },
+    {
+      "key": "name",
+      "label": "Borrower",
+      "type": "text",
+      "description": "Borrower name as reported by the platform"
+    },
+    {
+      "key": "borrowerKey",
+      "label": "Borrower key",
+      "type": "id",
+      "description": "Stable key for repeat-borrower grouping (name + age + city)"
+    },
+    {
+      "key": "repeatCount",
+      "label": "Loans by borrower",
+      "type": "int",
+      "description": "Number of loans in this export sharing the same borrower key"
+    },
+    {
+      "key": "age",
+      "label": "Age",
+      "type": "int",
+      "description": "Borrower age in years"
+    },
+    {
+      "key": "gender",
+      "label": "Gender",
+      "type": "code",
+      "description": "0 Male, 1 Female, 2 Other, 3 Unknown"
+    },
+    {
+      "key": "city",
+      "label": "City",
+      "type": "text",
+      "description": "Normalised city / district"
+    },
+    {
+      "key": "state",
+      "label": "State",
+      "type": "text",
+      "description": "Mapped Indian state (Other when unmapped)"
+    },
+    {
+      "key": "cityTier",
+      "label": "City tier",
+      "type": "code",
+      "description": "0 Unknown, 1 Metro, 2 Tier 2, 3 Other"
+    },
+    {
+      "key": "profession",
+      "label": "Borrower type",
+      "type": "code",
+      "description": "0 Salaried, 1 Self-employed"
+    },
+    {
+      "key": "stay",
+      "label": "Residence",
+      "type": "code",
+      "description": "0 Unknown, 1 Self-owned, 2 Rented"
+    },
+    {
+      "key": "income",
+      "label": "Monthly income",
+      "type": "money",
+      "description": "Self-reported monthly income; null when zero/missing"
+    },
+    {
+      "key": "borrowerAmount",
+      "label": "Borrower loan amount",
+      "type": "money",
+      "description": "Full loan sanctioned to the borrower"
+    },
+    {
+      "key": "bureau",
+      "label": "Bureau score",
+      "type": "score",
+      "description": "CRIF bureau score; null when missing"
+    },
+    {
+      "key": "score",
+      "label": "LenDenClub score",
+      "type": "score",
+      "description": "LDC score 700–878 in this book"
+    },
+    {
+      "key": "grade",
+      "label": "Risk grade",
+      "type": "code",
+      "description": "0 A (High), 1 AA (Medium), 2 AAA (Low)"
+    },
+    {
+      "key": "amount",
+      "label": "Invested amount",
+      "type": "money",
+      "description": "Your principal in this loan"
+    },
+    {
+      "key": "pos",
+      "label": "Principal outstanding",
+      "type": "money",
+      "description": "Remaining principal (0 for closed loans)"
+    },
+    {
+      "key": "rate",
+      "label": "Borrower APR",
+      "type": "percent",
+      "description": "Annualised borrower interest rate"
+    },
+    {
+      "key": "tenure",
+      "label": "Tenure (months)",
+      "type": "int",
+      "description": "Contracted loan tenure"
+    },
+    {
+      "key": "repay",
+      "label": "Repayment type",
+      "type": "code",
+      "description": "0 Monthly EMI, 1 Daily EDI"
+    },
+    {
+      "key": "listType",
+      "label": "Platform list",
+      "type": "code",
+      "description": "0 Open/active list, 1 Closed list"
+    },
+    {
+      "key": "status",
+      "label": "Status",
+      "type": "code",
+      "description": "0 Active, 1 Closed, 2 NPA"
+    },
+    {
+      "key": "dpd",
+      "label": "Days past due",
+      "type": "int",
+      "description": "Current days past due"
+    },
+    {
+      "key": "dpdBucket",
+      "label": "DPD bucket",
+      "type": "code",
+      "description": "0 0 DPD, 1 1–30, 2 31–60, 3 61–90, 4 90+"
+    },
+    {
+      "key": "overdue",
+      "label": "Overdue",
+      "type": "bool",
+      "description": "DPD > 0"
+    },
+    {
+      "key": "npa",
+      "label": "NPA",
+      "type": "bool",
+      "description": "Marked NPA by the platform"
+    },
+    {
+      "key": "prepaid",
+      "label": "Prepaid",
+      "type": "bool",
+      "description": "Closed before contractual maturity"
+    },
+    {
+      "key": "disb",
+      "label": "Disbursement date",
+      "type": "date",
+      "description": "Loan disbursement / investment date"
+    },
+    {
+      "key": "inv",
+      "label": "Investment date",
+      "type": "date",
+      "description": "Platform investment date"
+    },
+    {
+      "key": "maturity",
+      "label": "Maturity date",
+      "type": "date",
+      "description": "Contracted maturity"
+    },
+    {
+      "key": "closure",
+      "label": "Closure / NPA date",
+      "type": "date",
+      "description": "Actual closure or NPA classification date"
+    },
+    {
+      "key": "disbMonth",
+      "label": "Disbursement month",
+      "type": "month",
+      "description": "YYYY-MM"
+    },
+    {
+      "key": "maturityMonth",
+      "label": "Maturity month",
+      "type": "month",
+      "description": "YYYY-MM"
+    },
+    {
+      "key": "closureMonth",
+      "label": "Closure month",
+      "type": "month",
+      "description": "YYYY-MM"
+    },
+    {
+      "key": "received",
+      "label": "Total received",
+      "type": "money",
+      "description": "Principal + interest received to date"
+    },
+    {
+      "key": "principalRec",
+      "label": "Principal received",
+      "type": "money",
+      "description": "Principal recovered to date"
+    },
+    {
+      "key": "interestRec",
+      "label": "Interest received",
+      "type": "money",
+      "description": "Net interest received after platform fees"
+    },
+    {
+      "key": "fee",
+      "label": "Fees",
+      "type": "money",
+      "description": "Platform / facilitation fees deducted"
+    },
+    {
+      "key": "npaAmount",
+      "label": "NPA principal",
+      "type": "money",
+      "description": "Principal written off / outstanding at NPA"
+    },
+    {
+      "key": "netProfit",
+      "label": "Net profit",
+      "type": "money",
+      "description": "Interest net of fees and NPA write-off"
+    },
+    {
+      "key": "realizedRoi",
+      "label": "Realised ROI",
+      "type": "ratio",
+      "description": "Net profit ÷ invested amount"
+    },
+    {
+      "key": "reportedAnr",
+      "label": "Reported ANR",
+      "type": "percent",
+      "description": "Platform's annualised net return for closed loans"
+    },
+    {
+      "key": "expReturns",
+      "label": "Expected total returns",
+      "type": "money",
+      "description": "Lifetime contractual repayment for active loans"
+    },
+    {
+      "key": "futureInterest",
+      "label": "Future interest",
+      "type": "money",
+      "description": "Expected remaining interest on active loans"
+    },
+    {
+      "key": "futureFee",
+      "label": "Future fees",
+      "type": "money",
+      "description": "Estimated 1% platform fee on outstanding"
+    },
+    {
+      "key": "profitContractual",
+      "label": "Profit — contractual",
+      "type": "money",
+      "description": "Total lifetime profit if every active loan pays as agreed"
+    },
+    {
+      "key": "profitRecovery",
+      "label": "Profit — recovery",
+      "type": "money",
+      "description": "Impaired active loans recover 45% of principal"
+    },
+    {
+      "key": "profitStrict",
+      "label": "Profit — strict",
+      "type": "money",
+      "description": "Any DPD > 0 active loan is a 100% principal write-off"
+    },
+    {
+      "key": "xirrContractual",
+      "label": "XIRR — contractual",
+      "type": "percent",
+      "description": "Money-weighted return, contractual scenario"
+    },
+    {
+      "key": "xirrRecovery",
+      "label": "XIRR — recovery",
+      "type": "percent",
+      "description": "Money-weighted return, 45% recovery scenario"
+    },
+    {
+      "key": "xirrStrict",
+      "label": "XIRR — strict",
+      "type": "percent",
+      "description": "Money-weighted return, strict write-off scenario"
+    },
+    {
+      "key": "holdingDays",
+      "label": "Holding days",
+      "type": "int",
+      "description": "Days from disbursement to closure or as-of date"
+    },
+    {
+      "key": "vintageDays",
+      "label": "Vintage days",
+      "type": "int",
+      "description": "Days since disbursement"
+    },
+    {
+      "key": "seasoning",
+      "label": "Seasoning (months)",
+      "type": "ratio",
+      "description": "Vintage days ÷ 30.44"
+    },
+    {
+      "key": "isMatured",
+      "label": "Matured",
+      "type": "bool",
+      "description": "Contractual maturity has passed"
+    },
+    {
+      "key": "maturityGapDays",
+      "label": "Days to maturity",
+      "type": "int",
+      "description": "Negative when past maturity"
+    },
+    {
+      "key": "daysToClose",
+      "label": "Days to close",
+      "type": "int",
+      "description": "Disbursement to closure/NPA"
+    },
+    {
+      "key": "emi",
+      "label": "Estimated EMI",
+      "type": "money",
+      "description": "EMI implied by borrower amount, APR and tenure"
+    },
+    {
+      "key": "foir",
+      "label": "FOIR",
+      "type": "ratio",
+      "description": "Estimated EMI ÷ monthly income"
+    },
+    {
+      "key": "loanToAnnualIncome",
+      "label": "Loan / annual income",
+      "type": "ratio",
+      "description": "Borrower loan amount ÷ annual income"
+    },
+    {
+      "key": "recoveryRate",
+      "label": "Recovery rate",
+      "type": "ratio",
+      "description": "Principal recovered ÷ invested amount (NPA only)"
+    },
+    {
+      "key": "lossSeverity",
+      "label": "Loss severity",
+      "type": "ratio",
+      "description": "NPA principal ÷ invested amount"
+    },
+    {
+      "key": "impaired",
+      "label": "Impaired",
+      "type": "bool",
+      "description": "NPA or any DPD > 0"
+    },
+    {
+      "key": "incomeMissing",
+      "label": "Income missing",
+      "type": "bool",
+      "description": "Income absent or zero"
+    },
+    {
+      "key": "bureauMissing",
+      "label": "Bureau missing",
+      "type": "bool",
+      "description": "Bureau score absent or zero"
+    },
+    {
+      "key": "cityMissing",
+      "label": "City missing",
+      "type": "bool",
+      "description": "No usable city"
+    },
+    {
+      "key": "stayMissing",
+      "label": "Residence missing",
+      "type": "bool",
+      "description": "Residence type not supplied"
+    },
+    {
+      "key": "scheme",
+      "label": "Scheme ID",
+      "type": "id",
+      "description": "Platform scheme identifier"
+    }
+  ],
+  "availableLoans": [
+    {
+      "id": "LOA-SXDK6MKY",
+      "name": "Mr Kuppan  Dhinesh",
+      "loanAmount": 4000,
+      "fundedAmount": 3750,
+      "remainingAmount": 250,
+      "remainingPct": 6.25,
+      "tenure": 2,
+      "rate": 46.44,
+      "score": 757,
+      "riskType": "2",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        46.44,
+        46.94,
+        47.44
+      ]
+    },
+    {
+      "id": "LOA-4Q13A464",
+      "name": "Mr Subhasish  Samanta",
+      "loanAmount": 10000,
+      "fundedAmount": 8750,
+      "remainingAmount": 1250,
+      "remainingPct": 12.5,
+      "tenure": 4,
+      "rate": 46.44,
+      "score": 714,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        46.44,
+        46.94,
+        47.44
+      ]
+    },
+    {
+      "id": "LOA-F4PV9DNK",
+      "name": "Manjunath",
+      "loanAmount": 6000,
+      "fundedAmount": 4750,
+      "remainingAmount": 1250,
+      "remainingPct": 20.83,
+      "tenure": 3,
+      "rate": 44.52,
+      "score": 729,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        44.52,
+        45.02,
+        45.52
+      ]
+    },
+    {
+      "id": "LOA-GHF1MP7K",
+      "name": "Sk Raja",
+      "loanAmount": 7500,
+      "fundedAmount": 6250,
+      "remainingAmount": 1250,
+      "remainingPct": 16.67,
+      "tenure": 3,
+      "rate": 45.96,
+      "score": 748,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        45.96,
+        46.46,
+        46.96
+      ]
+    },
+    {
+      "id": "LOA-5BV3664D",
+      "name": "Sreerag M",
+      "loanAmount": 10000,
+      "fundedAmount": 8750,
+      "remainingAmount": 1250,
+      "remainingPct": 12.5,
+      "tenure": 3,
+      "rate": 44.52,
+      "score": 767,
+      "riskType": "2",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        44.52,
+        45.02,
+        45.52
+      ]
+    },
+    {
+      "id": "LOA-2FJN63UB",
+      "name": "Sridhar Peyappan",
+      "loanAmount": 8000,
+      "fundedAmount": 6750,
+      "remainingAmount": 1250,
+      "remainingPct": 15.63,
+      "tenure": 3,
+      "rate": 44.52,
+      "score": 776,
+      "riskType": "2",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        44.52,
+        45.02,
+        45.52
+      ]
+    },
+    {
+      "id": "LOA-QZHXGFMN",
+      "name": "Sandeep Kumar",
+      "loanAmount": 4500,
+      "fundedAmount": 3250,
+      "remainingAmount": 1250,
+      "remainingPct": 27.78,
+      "tenure": 3,
+      "rate": 44.52,
+      "score": 724,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        44.52,
+        45.02,
+        45.52
+      ]
+    },
+    {
+      "id": "LOA-RKXZKR7F",
+      "name": "Yasmin",
+      "loanAmount": 5000,
+      "fundedAmount": 3750,
+      "remainingAmount": 1250,
+      "remainingPct": 25,
+      "tenure": 2,
+      "rate": 46.44,
+      "score": 744,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        46.44,
+        46.94,
+        47.44
+      ]
+    },
+    {
+      "id": "LOA-Q4BMBXMC",
+      "name": "Aamir Khan",
+      "loanAmount": 3000,
+      "fundedAmount": 1750,
+      "remainingAmount": 1250,
+      "remainingPct": 41.67,
+      "tenure": 4,
+      "rate": 44.52,
+      "score": 724,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        44.52,
+        45.02,
+        45.52
+      ]
+    },
+    {
+      "id": "LOA-XBE8S6CB",
+      "name": "Anmol Prasad",
+      "loanAmount": 7500,
+      "fundedAmount": 6250,
+      "remainingAmount": 1250,
+      "remainingPct": 16.67,
+      "tenure": 3,
+      "rate": 47.88,
+      "score": 710,
+      "riskType": "1",
+      "lendingAmount": 1000,
+      "repay": "Monthly",
+      "roiList": [
+        47.88,
+        48.38,
+        48.88
+      ]
+    }
+  ],
+  "monthly": {
+    "2026-10": {
+      "month": "2026-10",
+      "loans": 718,
+      "lent": 214750,
+      "active": 696,
+      "closed": 22,
+      "npa": 0,
+      "profit": 564.6,
+      "received": 9100.21,
+      "pos": 206214.39
+    },
+    "2026-09": {
+      "month": "2026-09",
+      "loans": 2040,
+      "lent": 569000,
+      "active": 1735,
+      "closed": 305,
+      "npa": 0,
+      "profit": 16621.43,
+      "received": 234835.02,
+      "pos": 350780.14
+    },
+    "2026-08": {
+      "month": "2026-08",
+      "loans": 30,
+      "lent": 48000,
+      "active": 14,
+      "closed": 16,
+      "npa": 0,
+      "profit": 2992.69,
+      "received": 41208.82,
+      "pos": 9783.87
+    },
+    "2026-07": {
+      "month": "2026-07",
+      "loans": 148,
+      "lent": 448000,
+      "active": 82,
+      "closed": 66,
+      "npa": 0,
+      "profit": 35101.23,
+      "received": 347566.02,
+      "pos": 135535.21
+    },
+    "2026-06": {
+      "month": "2026-06",
+      "loans": 33,
+      "lent": 115750,
+      "active": 20,
+      "closed": 13,
+      "npa": 1,
+      "profit": 6335.34,
+      "received": 80330.32,
+      "pos": 41755.02
+    },
+    "2026-05": {
+      "month": "2026-05",
+      "loans": 72,
+      "lent": 239500,
+      "active": 21,
+      "closed": 51,
+      "npa": 4,
+      "profit": 19961.56,
+      "received": 229439.2,
+      "pos": 30022.36
+    },
+    "2026-04": {
+      "month": "2026-04",
+      "loans": 170,
+      "lent": 361500,
+      "active": 10,
+      "closed": 160,
+      "npa": 15,
+      "profit": 9269.46,
+      "received": 361473.42,
+      "pos": 9296.04
+    },
+    "2026-03": {
+      "month": "2026-03",
+      "loans": 191,
+      "lent": 304000,
+      "active": 5,
+      "closed": 186,
+      "npa": 19,
+      "profit": 19990.92,
+      "received": 320490.92,
+      "pos": 3500.02
+    },
+    "2026-02": {
+      "month": "2026-02",
+      "loans": 163,
+      "lent": 169500,
+      "active": 6,
+      "closed": 157,
+      "npa": 20,
+      "profit": 2255.84,
+      "received": 168839.15,
+      "pos": 2916.69
+    },
+    "2026-01": {
+      "month": "2026-01",
+      "loans": 835,
+      "lent": 509750,
+      "active": 39,
+      "closed": 796,
+      "npa": 67,
+      "profit": 48329.25,
+      "received": 551889.92,
+      "pos": 6189.32
+    },
+    "2025-12": {
+      "month": "2025-12",
+      "loans": 1167,
+      "lent": 334250,
+      "active": 5,
+      "closed": 1162,
+      "npa": 108,
+      "profit": 29518,
+      "received": 363650.05,
+      "pos": 117.94
+    }
+  },
+  "notes": [
+    "Returns are shown under three scenarios: contractual, 45% recovery on impaired active loans, and strict write-off of any active loan with DPD > 0.",
+    "The platform ANR (16.1% on closed loans) is money-weighted across the whole book; averaging per-loan annualised returns overstates it because short-tenure loans annualise small absolute gains.",
+    "DPD is a point-in-time snapshot. A loan can cure, so strict write-off is deliberately conservative.",
+    "NPA classification lags delinquency by roughly 150 days in this book; recent cohorts therefore look artificially clean.",
+    "XIRR is approximate: repayment dates are not present in the export, so closed-loan inflows are dated at closure and active inflows at the as-of date.",
+    "Borrower state is derived from a curated city/district map; unmapped places are labelled Other.",
+    "This is an analytics/education project, not investment advice."
+  ]
+}

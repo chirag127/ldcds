@@ -1,0 +1,25 @@
+# Raw exports contain borrower PII, signed agreement URLs and investor PII.
+# Never commit them. Keep them locally in data/raw/.
+/data/raw/
+*.har
+lending_data_import_*.json
+lendenclub_FULL_*.json
+lendenclub_loans_*.csv
+
+# Local-only build artefacts
+/data/local/
+.tmp/
+.env
+.env.local
+
+# Dependencies / build output
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,2129 @@
+{
+  "schemaVersion": 3,
+  "generatedAt": "2026-10-20T16:25:17.062Z",
+  "asOf": "2026-10-20",
+  "trainedOn": "Closed loans only (status CLOSED or NPA)",
+  "observations": 2934,
+  "events": 234,
+  "eventRate": 0.0798,
+  "features": [
+    {
+      "key": "score",
+      "label": "LenDenClub score",
+      "kind": "num"
+    },
+    {
+      "key": "bureau",
+      "label": "Bureau score",
+      "kind": "num"
+    },
+    {
+      "key": "tenure",
+      "label": "Tenure (months)",
+      "kind": "num"
+    },
+    {
+      "key": "rate",
+      "label": "Borrower APR",
+      "kind": "num"
+    },
+    {
+      "key": "age",
+      "label": "Borrower age",
+      "kind": "num"
+    },
+    {
+      "key": "logBorrowerAmount",
+      "label": "Log borrower amount",
+      "kind": "num"
+    },
+    {
+      "key": "logIncome",
+      "label": "Log monthly income",
+      "kind": "num"
+    },
+    {
+      "key": "foir",
+      "label": "FOIR",
+      "kind": "num"
+    },
+    {
+      "key": "loanToAnnualIncome",
+      "label": "Loan / annual income",
+      "kind": "num"
+    },
+    {
+      "key": "profession",
+      "label": "Self-employed",
+      "kind": "cat"
+    },
+    {
+      "key": "female",
+      "label": "Female borrower",
+      "kind": "cat"
+    },
+    {
+      "key": "tier2",
+      "label": "Tier 2 city",
+      "kind": "cat"
+    },
+    {
+      "key": "tier3",
+      "label": "Tier 3 city",
+      "kind": "cat"
+    },
+    {
+      "key": "stayOwned",
+      "label": "Self-owned home",
+      "kind": "cat"
+    },
+    {
+      "key": "stayRented",
+      "label": "Rented home",
+      "kind": "cat"
+    },
+    {
+      "key": "daily",
+      "label": "Daily repayment",
+      "kind": "cat"
+    },
+    {
+      "key": "gradeAA",
+      "label": "Grade AA",
+      "kind": "cat"
+    }
+  ],
+  "coefficients": [
+    {
+      "key": "score",
+      "label": "LenDenClub score",
+      "coef": -0.2263,
+      "mean": 733.1622,
+      "std": 20.2132,
+      "impute": 724,
+      "iv": 0.194
+    },
+    {
+      "key": "bureau",
+      "label": "Bureau score",
+      "coef": -0.3925,
+      "mean": 644.4294,
+      "std": 117.8012,
+      "impute": 678,
+      "iv": 0.227
+    },
+    {
+      "key": "tenure",
+      "label": "Tenure (months)",
+      "coef": 0.5417,
+      "mean": 4.1264,
+      "std": 1.7291,
+      "impute": 4,
+      "iv": 0.627
+    },
+    {
+      "key": "rate",
+      "label": "Borrower APR",
+      "coef": -0.0515,
+      "mean": 45.7557,
+      "std": 2.7297,
+      "impute": 46.44,
+      "iv": 0.083
+    },
+    {
+      "key": "age",
+      "label": "Borrower age",
+      "coef": -0.0415,
+      "mean": 35.1953,
+      "std": 7.5551,
+      "impute": 34,
+      "iv": 0.031
+    },
+    {
+      "key": "logBorrowerAmount",
+      "label": "Log borrower amount",
+      "coef": 0.5199,
+      "mean": 9.2585,
+      "std": 0.8389,
+      "impute": 9.2104,
+      "iv": 0.336
+    },
+    {
+      "key": "logIncome",
+      "label": "Log monthly income",
+      "coef": -0.3048,
+      "mean": 11.1745,
+      "std": 0.7262,
+      "impute": 11.1451,
+      "iv": 0.038
+    },
+    {
+      "key": "foir",
+      "label": "FOIR",
+      "coef": 0.0142,
+      "mean": 0.0576,
+      "std": 0.051,
+      "impute": 0.0451,
+      "iv": 0.079
+    },
+    {
+      "key": "loanToAnnualIncome",
+      "label": "Loan / annual income",
+      "coef": -0.1883,
+      "mean": 0.0189,
+      "std": 0.0187,
+      "impute": 0.0133,
+      "iv": 0.143
+    },
+    {
+      "key": "profession",
+      "label": "Self-employed",
+      "coef": 0.0183,
+      "mean": 0.0988,
+      "std": 0.2984,
+      "impute": 0,
+      "iv": 0.036
+    },
+    {
+      "key": "female",
+      "label": "Female borrower",
+      "coef": 0.0284,
+      "mean": 0.1339,
+      "std": 0.3406,
+      "impute": 0,
+      "iv": 0.001
+    },
+    {
+      "key": "tier2",
+      "label": "Tier 2 city",
+      "coef": -0.0963,
+      "mean": 0.0477,
+      "std": 0.2132,
+      "impute": 0,
+      "iv": 0.002
+    },
+    {
+      "key": "tier3",
+      "label": "Tier 3 city",
+      "coef": -0.0563,
+      "mean": 0.682,
+      "std": 0.4657,
+      "impute": 1,
+      "iv": 0.001
+    },
+    {
+      "key": "stayOwned",
+      "label": "Self-owned home",
+      "coef": -0.0124,
+      "mean": 0.1987,
+      "std": 0.399,
+      "impute": 0,
+      "iv": 0.004
+    },
+    {
+      "key": "stayRented",
+      "label": "Rented home",
+      "coef": 0.0125,
+      "mean": 0.0641,
+      "std": 0.2449,
+      "impute": 0,
+      "iv": 0
+    },
+    {
+      "key": "daily",
+      "label": "Daily repayment",
+      "coef": 0,
+      "mean": 0,
+      "std": 1,
+      "impute": 0,
+      "iv": 0.005
+    },
+    {
+      "key": "gradeAA",
+      "label": "Grade AA",
+      "coef": -0.6419,
+      "mean": 0.1309,
+      "std": 0.3373,
+      "impute": 0,
+      "iv": 0.089
+    }
+  ],
+  "intercept": -0.468,
+  "metrics": {
+    "auc": 0.7443,
+    "gini": 0.4886,
+    "ks": 0.415,
+    "accuracy": 0.6577,
+    "precision": 0.1728,
+    "recall": 0.7368,
+    "f1": 0.28,
+    "logLoss": 0.608,
+    "brier": 0.213,
+    "cvAuc": 0.7185,
+    "cvFolds": 5,
+    "trainSize": 2303,
+    "testSize": 631,
+    "confusion": {
+      "tp": 42,
+      "fp": 201,
+      "fn": 15,
+      "tn": 373
+    }
+  },
+  "roc": [
+    {
+      "fpr": 0.0017,
+      "tpr": 0
+    },
+    {
+      "fpr": 0.0139,
+      "tpr": 0
+    },
+    {
+      "fpr": 0.0209,
+      "tpr": 0.0526
+    },
+    {
+      "fpr": 0.0296,
+      "tpr": 0.0877
+    },
+    {
+      "fpr": 0.0401,
+      "tpr": 0.1053
+    },
+    {
+      "fpr": 0.0488,
+      "tpr": 0.1404
+    },
+    {
+      "fpr": 0.0592,
+      "tpr": 0.1579
+    },
+    {
+      "fpr": 0.0679,
+      "tpr": 0.193
+    },
+    {
+      "fpr": 0.0767,
+      "tpr": 0.2281
+    },
+    {
+      "fpr": 0.0836,
+      "tpr": 0.2807
+    },
+    {
+      "fpr": 0.0941,
+      "tpr": 0.2982
+    },
+    {
+      "fpr": 0.1045,
+      "tpr": 0.3158
+    },
+    {
+      "fpr": 0.1115,
+      "tpr": 0.3684
+    },
+    {
+      "fpr": 0.122,
+      "tpr": 0.386
+    },
+    {
+      "fpr": 0.1341,
+      "tpr": 0.386
+    },
+    {
+      "fpr": 0.1446,
+      "tpr": 0.4035
+    },
+    {
+      "fpr": 0.1533,
+      "tpr": 0.4386
+    },
+    {
+      "fpr": 0.1638,
+      "tpr": 0.4561
+    },
+    {
+      "fpr": 0.1742,
+      "tpr": 0.4737
+    },
+    {
+      "fpr": 0.1864,
+      "tpr": 0.4737
+    },
+    {
+      "fpr": 0.1986,
+      "tpr": 0.4737
+    },
+    {
+      "fpr": 0.2073,
+      "tpr": 0.5088
+    },
+    {
+      "fpr": 0.216,
+      "tpr": 0.5439
+    },
+    {
+      "fpr": 0.2282,
+      "tpr": 0.5439
+    },
+    {
+      "fpr": 0.2387,
+      "tpr": 0.5614
+    },
+    {
+      "fpr": 0.2491,
+      "tpr": 0.5789
+    },
+    {
+      "fpr": 0.2613,
+      "tpr": 0.5789
+    },
+    {
+      "fpr": 0.2718,
+      "tpr": 0.5965
+    },
+    {
+      "fpr": 0.2822,
+      "tpr": 0.614
+    },
+    {
+      "fpr": 0.2909,
+      "tpr": 0.6491
+    },
+    {
+      "fpr": 0.3014,
+      "tpr": 0.6667
+    },
+    {
+      "fpr": 0.3136,
+      "tpr": 0.6667
+    },
+    {
+      "fpr": 0.324,
+      "tpr": 0.6842
+    },
+    {
+      "fpr": 0.3345,
+      "tpr": 0.7018
+    },
+    {
+      "fpr": 0.3432,
+      "tpr": 0.7368
+    },
+    {
+      "fpr": 0.3554,
+      "tpr": 0.7368
+    },
+    {
+      "fpr": 0.3676,
+      "tpr": 0.7368
+    },
+    {
+      "fpr": 0.3763,
+      "tpr": 0.7719
+    },
+    {
+      "fpr": 0.3868,
+      "tpr": 0.7895
+    },
+    {
+      "fpr": 0.3972,
+      "tpr": 0.807
+    },
+    {
+      "fpr": 0.4094,
+      "tpr": 0.807
+    },
+    {
+      "fpr": 0.4199,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4321,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4443,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4564,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4686,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4808,
+      "tpr": 0.8246
+    },
+    {
+      "fpr": 0.4895,
+      "tpr": 0.8596
+    },
+    {
+      "fpr": 0.5017,
+      "tpr": 0.8596
+    },
+    {
+      "fpr": 0.5122,
+      "tpr": 0.8772
+    },
+    {
+      "fpr": 0.5244,
+      "tpr": 0.8772
+    },
+    {
+      "fpr": 0.5348,
+      "tpr": 0.8947
+    },
+    {
+      "fpr": 0.547,
+      "tpr": 0.8947
+    },
+    {
+      "fpr": 0.5592,
+      "tpr": 0.8947
+    },
+    {
+      "fpr": 0.5714,
+      "tpr": 0.8947
+    },
+    {
+      "fpr": 0.5819,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.5941,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6063,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6185,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6307,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6429,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6551,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6672,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6794,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.6916,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.7038,
+      "tpr": 0.9123
+    },
+    {
+      "fpr": 0.7143,
+      "tpr": 0.9298
+    },
+    {
+      "fpr": 0.7265,
+      "tpr": 0.9298
+    },
+    {
+      "fpr": 0.7387,
+      "tpr": 0.9298
+    },
+    {
+      "fpr": 0.7491,
+      "tpr": 0.9474
+    },
+    {
+      "fpr": 0.7613,
+      "tpr": 0.9474
+    },
+    {
+      "fpr": 0.7718,
+      "tpr": 0.9649
+    },
+    {
+      "fpr": 0.7822,
+      "tpr": 0.9825
+    },
+    {
+      "fpr": 0.7944,
+      "tpr": 0.9825
+    },
+    {
+      "fpr": 0.8066,
+      "tpr": 0.9825
+    },
+    {
+      "fpr": 0.8188,
+      "tpr": 0.9825
+    },
+    {
+      "fpr": 0.831,
+      "tpr": 0.9825
+    },
+    {
+      "fpr": 0.8415,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.8537,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.8659,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.878,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.8902,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9024,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9146,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9268,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.939,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9512,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9634,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9756,
+      "tpr": 1
+    },
+    {
+      "fpr": 0.9878,
+      "tpr": 1
+    },
+    {
+      "fpr": 1,
+      "tpr": 1
+    }
+  ],
+  "lift": [
+    {
+      "decile": 1,
+      "count": 64,
+      "bad": 16,
+      "badRate": 0.25,
+      "lift": 2.768,
+      "avgScore": 0.7669
+    },
+    {
+      "decile": 2,
+      "count": 64,
+      "bad": 11,
+      "badRate": 0.1719,
+      "lift": 1.903,
+      "avgScore": 0.6615
+    },
+    {
+      "decile": 3,
+      "count": 64,
+      "bad": 8,
+      "badRate": 0.125,
+      "lift": 1.384,
+      "avgScore": 0.5959
+    },
+    {
+      "decile": 4,
+      "count": 64,
+      "bad": 7,
+      "badRate": 0.1094,
+      "lift": 1.211,
+      "avgScore": 0.5209
+    },
+    {
+      "decile": 5,
+      "count": 64,
+      "bad": 5,
+      "badRate": 0.0781,
+      "lift": 0.865,
+      "avgScore": 0.4549
+    },
+    {
+      "decile": 6,
+      "count": 64,
+      "bad": 5,
+      "badRate": 0.0781,
+      "lift": 0.865,
+      "avgScore": 0.4019
+    },
+    {
+      "decile": 7,
+      "count": 64,
+      "bad": 0,
+      "badRate": 0,
+      "lift": 0,
+      "avgScore": 0.3432
+    },
+    {
+      "decile": 8,
+      "count": 64,
+      "bad": 4,
+      "badRate": 0.0625,
+      "lift": 0.692,
+      "avgScore": 0.276
+    },
+    {
+      "decile": 9,
+      "count": 64,
+      "bad": 1,
+      "badRate": 0.0156,
+      "lift": 0.173,
+      "avgScore": 0.1787
+    },
+    {
+      "decile": 10,
+      "count": 55,
+      "bad": 0,
+      "badRate": 0,
+      "lift": 0,
+      "avgScore": 0.0296
+    }
+  ],
+  "calibration": [
+    {
+      "bin": 1,
+      "predicted": 0.0405,
+      "actual": 0,
+      "count": 64
+    },
+    {
+      "bin": 2,
+      "predicted": 0.198,
+      "actual": 0.0313,
+      "count": 64
+    },
+    {
+      "bin": 3,
+      "predicted": 0.2857,
+      "actual": 0.0469,
+      "count": 64
+    },
+    {
+      "bin": 4,
+      "predicted": 0.3528,
+      "actual": 0.0156,
+      "count": 64
+    },
+    {
+      "bin": 5,
+      "predicted": 0.4088,
+      "actual": 0.0625,
+      "count": 64
+    },
+    {
+      "bin": 6,
+      "predicted": 0.4634,
+      "actual": 0.0781,
+      "count": 64
+    },
+    {
+      "bin": 7,
+      "predicted": 0.5314,
+      "actual": 0.1406,
+      "count": 64
+    },
+    {
+      "bin": 8,
+      "predicted": 0.6057,
+      "actual": 0.125,
+      "count": 64
+    },
+    {
+      "bin": 9,
+      "predicted": 0.6705,
+      "actual": 0.1875,
+      "count": 64
+    },
+    {
+      "bin": 10,
+      "predicted": 0.778,
+      "actual": 0.2364,
+      "count": 55
+    }
+  ],
+  "woe": [
+    {
+      "key": "score",
+      "label": "LenDenClub score",
+      "iv": 0.194,
+      "bins": [
+        {
+          "bin": "700 – 720",
+          "count": 355,
+          "bad": 38,
+          "good": 317,
+          "badRate": 0.107,
+          "woe": 0.328
+        },
+        {
+          "bin": "720 – 724",
+          "count": 1026,
+          "bad": 78,
+          "good": 948,
+          "badRate": 0.076,
+          "woe": -0.054
+        },
+        {
+          "bin": "724 – 752",
+          "count": 945,
+          "bad": 100,
+          "good": 845,
+          "badRate": 0.1058,
+          "woe": 0.308
+        },
+        {
+          "bin": "752 – 835",
+          "count": 608,
+          "bad": 18,
+          "good": 590,
+          "badRate": 0.0296,
+          "woe": -1.025
+        }
+      ]
+    },
+    {
+      "key": "bureau",
+      "label": "Bureau score",
+      "iv": 0.227,
+      "bins": [
+        {
+          "bin": "10 – 583",
+          "count": 585,
+          "bad": 87,
+          "good": 498,
+          "badRate": 0.1487,
+          "woe": 0.696
+        },
+        {
+          "bin": "583 – 667",
+          "count": 587,
+          "bad": 36,
+          "good": 551,
+          "badRate": 0.0613,
+          "woe": -0.279
+        },
+        {
+          "bin": "667 – 691",
+          "count": 568,
+          "bad": 29,
+          "good": 539,
+          "badRate": 0.0511,
+          "woe": -0.47
+        },
+        {
+          "bin": "691 – 713",
+          "count": 599,
+          "bad": 29,
+          "good": 570,
+          "badRate": 0.0484,
+          "woe": -0.526
+        },
+        {
+          "bin": "713 – 826",
+          "count": 594,
+          "bad": 53,
+          "good": 541,
+          "badRate": 0.0892,
+          "woe": 0.121
+        }
+      ]
+    },
+    {
+      "key": "tenure",
+      "label": "Tenure (months)",
+      "iv": 0.627,
+      "bins": [
+        {
+          "bin": "2 – 3",
+          "count": 437,
+          "bad": 3,
+          "good": 434,
+          "badRate": 0.0069,
+          "woe": -2.384
+        },
+        {
+          "bin": "3 – 4",
+          "count": 634,
+          "bad": 35,
+          "good": 599,
+          "badRate": 0.0552,
+          "woe": -0.389
+        },
+        {
+          "bin": "4 – 6",
+          "count": 1204,
+          "bad": 83,
+          "good": 1121,
+          "badRate": 0.0689,
+          "woe": -0.16
+        },
+        {
+          "bin": "6 – 12",
+          "count": 659,
+          "bad": 113,
+          "good": 546,
+          "badRate": 0.1715,
+          "woe": 0.866
+        }
+      ]
+    },
+    {
+      "key": "rate",
+      "label": "Borrower APR",
+      "iv": 0.083,
+      "bins": [
+        {
+          "bin": "24 – 45",
+          "count": 578,
+          "bad": 25,
+          "good": 553,
+          "badRate": 0.0433,
+          "woe": -0.642
+        },
+        {
+          "bin": "45 – 46.2",
+          "count": 390,
+          "bad": 35,
+          "good": 355,
+          "badRate": 0.0897,
+          "woe": 0.132
+        },
+        {
+          "bin": "46.2 – 46.8",
+          "count": 517,
+          "bad": 54,
+          "good": 463,
+          "badRate": 0.1044,
+          "woe": 0.295
+        },
+        {
+          "bin": "46.8 – 47.4",
+          "count": 638,
+          "bad": 52,
+          "good": 586,
+          "badRate": 0.0815,
+          "woe": 0.023
+        },
+        {
+          "bin": "47.4 – 58.2",
+          "count": 811,
+          "bad": 68,
+          "good": 743,
+          "badRate": 0.0838,
+          "woe": 0.051
+        }
+      ]
+    },
+    {
+      "key": "age",
+      "label": "Borrower age",
+      "iv": 0.031,
+      "bins": [
+        {
+          "bin": "21 – 28",
+          "count": 478,
+          "bad": 52,
+          "good": 426,
+          "badRate": 0.1088,
+          "woe": 0.341
+        },
+        {
+          "bin": "28 – 32",
+          "count": 586,
+          "bad": 47,
+          "good": 539,
+          "badRate": 0.0802,
+          "woe": 0.006
+        },
+        {
+          "bin": "32 – 36",
+          "count": 567,
+          "bad": 38,
+          "good": 529,
+          "badRate": 0.067,
+          "woe": -0.185
+        },
+        {
+          "bin": "36 – 42",
+          "count": 695,
+          "bad": 53,
+          "good": 642,
+          "badRate": 0.0763,
+          "woe": -0.05
+        },
+        {
+          "bin": "42 – 57",
+          "count": 608,
+          "bad": 44,
+          "good": 564,
+          "badRate": 0.0724,
+          "woe": -0.104
+        }
+      ]
+    },
+    {
+      "key": "logBorrowerAmount",
+      "label": "Log borrower amount",
+      "iv": 0.336,
+      "bins": [
+        {
+          "bin": "6.2 – 8.5",
+          "count": 324,
+          "bad": 13,
+          "good": 311,
+          "badRate": 0.0401,
+          "woe": -0.703
+        },
+        {
+          "bin": "8.5 – 9",
+          "count": 745,
+          "bad": 39,
+          "good": 706,
+          "badRate": 0.0523,
+          "woe": -0.448
+        },
+        {
+          "bin": "9 – 9.4",
+          "count": 683,
+          "bad": 36,
+          "good": 647,
+          "badRate": 0.0527,
+          "woe": -0.44
+        },
+        {
+          "bin": "9.4 – 9.9",
+          "count": 514,
+          "bad": 36,
+          "good": 478,
+          "badRate": 0.07,
+          "woe": -0.137
+        },
+        {
+          "bin": "9.9 – 12.4",
+          "count": 668,
+          "bad": 110,
+          "good": 558,
+          "badRate": 0.1647,
+          "woe": 0.816
+        }
+      ]
+    },
+    {
+      "key": "logIncome",
+      "label": "Log monthly income",
+      "iv": 0.038,
+      "bins": [
+        {
+          "bin": "8.5 – 10.5",
+          "count": 514,
+          "bad": 37,
+          "good": 477,
+          "badRate": 0.072,
+          "woe": -0.108
+        },
+        {
+          "bin": "10.5 – 11",
+          "count": 515,
+          "bad": 48,
+          "good": 467,
+          "badRate": 0.0932,
+          "woe": 0.17
+        },
+        {
+          "bin": "11 – 11.3",
+          "count": 515,
+          "bad": 47,
+          "good": 468,
+          "badRate": 0.0913,
+          "woe": 0.147
+        },
+        {
+          "bin": "11.3 – 11.8",
+          "count": 515,
+          "bad": 34,
+          "good": 481,
+          "badRate": 0.066,
+          "woe": -0.2
+        },
+        {
+          "bin": "11.8 – 14.5",
+          "count": 516,
+          "bad": 55,
+          "good": 461,
+          "badRate": 0.1066,
+          "woe": 0.318
+        }
+      ]
+    },
+    {
+      "key": "foir",
+      "label": "FOIR",
+      "iv": 0.079,
+      "bins": [
+        {
+          "bin": "0 – 0",
+          "count": 514,
+          "bad": 28,
+          "good": 486,
+          "badRate": 0.0545,
+          "woe": -0.401
+        },
+        {
+          "bin": "0 – 0",
+          "count": 512,
+          "bad": 41,
+          "good": 471,
+          "badRate": 0.0801,
+          "woe": 0.006
+        },
+        {
+          "bin": "0 – 0.1",
+          "count": 517,
+          "bad": 38,
+          "good": 479,
+          "badRate": 0.0735,
+          "woe": -0.086
+        },
+        {
+          "bin": "0.1 – 0.1",
+          "count": 513,
+          "bad": 54,
+          "good": 459,
+          "badRate": 0.1053,
+          "woe": 0.304
+        },
+        {
+          "bin": "0.1 – 0.6",
+          "count": 519,
+          "bad": 60,
+          "good": 459,
+          "badRate": 0.1156,
+          "woe": 0.408
+        }
+      ]
+    },
+    {
+      "key": "loanToAnnualIncome",
+      "label": "Loan / annual income",
+      "iv": 0.143,
+      "bins": [
+        {
+          "bin": "0 – 0",
+          "count": 510,
+          "bad": 25,
+          "good": 485,
+          "badRate": 0.049,
+          "woe": -0.511
+        },
+        {
+          "bin": "0 – 0",
+          "count": 512,
+          "bad": 29,
+          "good": 483,
+          "badRate": 0.0566,
+          "woe": -0.361
+        },
+        {
+          "bin": "0 – 0",
+          "count": 522,
+          "bad": 47,
+          "good": 475,
+          "badRate": 0.09,
+          "woe": 0.132
+        },
+        {
+          "bin": "0 – 0",
+          "count": 513,
+          "bad": 51,
+          "good": 462,
+          "badRate": 0.0994,
+          "woe": 0.241
+        },
+        {
+          "bin": "0 – 0.2",
+          "count": 518,
+          "bad": 69,
+          "good": 449,
+          "badRate": 0.1332,
+          "woe": 0.569
+        }
+      ]
+    },
+    {
+      "key": "profession",
+      "label": "Self-employed",
+      "iv": 0.036,
+      "bins": [
+        {
+          "bin": "Self-employed: no",
+          "count": 2644,
+          "bad": 222,
+          "good": 2422,
+          "badRate": 0.084,
+          "woe": 0.054
+        },
+        {
+          "bin": "Self-employed: yes",
+          "count": 290,
+          "bad": 12,
+          "good": 278,
+          "badRate": 0.0414,
+          "woe": -0.662
+        }
+      ]
+    },
+    {
+      "key": "female",
+      "label": "Female borrower",
+      "iv": 0.001,
+      "bins": [
+        {
+          "bin": "Female borrower: no",
+          "count": 2541,
+          "bad": 201,
+          "good": 2340,
+          "badRate": 0.0791,
+          "woe": -0.011
+        },
+        {
+          "bin": "Female borrower: yes",
+          "count": 393,
+          "bad": 33,
+          "good": 360,
+          "badRate": 0.084,
+          "woe": 0.066
+        }
+      ]
+    },
+    {
+      "key": "tier2",
+      "label": "Tier 2 city",
+      "iv": 0.002,
+      "bins": [
+        {
+          "bin": "Tier 2 city: no",
+          "count": 2794,
+          "bad": 225,
+          "good": 2569,
+          "badRate": 0.0805,
+          "woe": 0.009
+        },
+        {
+          "bin": "Tier 2 city: yes",
+          "count": 140,
+          "bad": 9,
+          "good": 131,
+          "badRate": 0.0643,
+          "woe": -0.186
+        }
+      ]
+    },
+    {
+      "key": "tier3",
+      "label": "Tier 3 city",
+      "iv": 0.001,
+      "bins": [
+        {
+          "bin": "Tier 3 city: no",
+          "count": 933,
+          "bad": 77,
+          "good": 856,
+          "badRate": 0.0825,
+          "woe": 0.039
+        },
+        {
+          "bin": "Tier 3 city: yes",
+          "count": 2001,
+          "bad": 157,
+          "good": 1844,
+          "badRate": 0.0785,
+          "woe": -0.019
+        }
+      ]
+    },
+    {
+      "key": "stayOwned",
+      "label": "Self-owned home",
+      "iv": 0.004,
+      "bins": [
+        {
+          "bin": "Self-owned home: no",
+          "count": 2351,
+          "bad": 193,
+          "good": 2158,
+          "badRate": 0.0821,
+          "woe": 0.03
+        },
+        {
+          "bin": "Self-owned home: yes",
+          "count": 583,
+          "bad": 41,
+          "good": 542,
+          "badRate": 0.0703,
+          "woe": -0.129
+        }
+      ]
+    },
+    {
+      "key": "stayRented",
+      "label": "Rented home",
+      "iv": 0,
+      "bins": [
+        {
+          "bin": "Rented home: no",
+          "count": 2746,
+          "bad": 220,
+          "good": 2526,
+          "badRate": 0.0801,
+          "woe": 0.003
+        },
+        {
+          "bin": "Rented home: yes",
+          "count": 188,
+          "bad": 14,
+          "good": 174,
+          "badRate": 0.0745,
+          "woe": -0.046
+        }
+      ]
+    },
+    {
+      "key": "daily",
+      "label": "Daily repayment",
+      "iv": 0.005,
+      "bins": [
+        {
+          "bin": "Daily repayment: no",
+          "count": 2934,
+          "bad": 234,
+          "good": 2700,
+          "badRate": 0.0798,
+          "woe": -0.002
+        }
+      ]
+    },
+    {
+      "key": "gradeAA",
+      "label": "Grade AA",
+      "iv": 0.089,
+      "bins": [
+        {
+          "bin": "Grade AA: no",
+          "count": 2550,
+          "bad": 222,
+          "good": 2328,
+          "badRate": 0.0871,
+          "woe": 0.094
+        },
+        {
+          "bin": "Grade AA: yes",
+          "count": 384,
+          "bad": 12,
+          "good": 372,
+          "badRate": 0.0313,
+          "woe": -0.953
+        }
+      ]
+    }
+  ],
+  "lgd": 0.55,
+  "recoveryRate": 0.45,
+  "policyGrid": [
+    {
+      "minScore": 720,
+      "maxTenure": 2,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 403,
+      "approvalRate": 0.1374,
+      "npaRate": 0.005,
+      "npaUpper95": 0.0179,
+      "avgReportedAnr": 32.57,
+      "lent": 216500,
+      "profit": 12310.74,
+      "avgProfit": 30.55,
+      "simpleAnnual": 64.63,
+      "xirr": 61.66,
+      "expectedLossRate": 0.0027
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 2,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 437,
+      "approvalRate": 0.1489,
+      "npaRate": 0.0069,
+      "npaUpper95": 0.02,
+      "avgReportedAnr": 32.24,
+      "lent": 235250,
+      "profit": 13345.12,
+      "avgProfit": 30.54,
+      "simpleAnnual": 62.46,
+      "xirr": 61.53,
+      "expectedLossRate": 0.0038
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 2,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 325,
+      "approvalRate": 0.1108,
+      "npaRate": 0.0092,
+      "npaUpper95": 0.0268,
+      "avgReportedAnr": 31.43,
+      "lent": 199500,
+      "profit": 11228.16,
+      "avgProfit": 34.55,
+      "simpleAnnual": 57.49,
+      "xirr": 58.26,
+      "expectedLossRate": 0.0051
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 365,
+      "approvalRate": 0.1244,
+      "npaRate": 0.0137,
+      "npaUpper95": 0.0317,
+      "avgReportedAnr": 32.31,
+      "lent": 174250,
+      "profit": 13805.8,
+      "avgProfit": 37.82,
+      "simpleAnnual": 49,
+      "xirr": 47.74,
+      "expectedLossRate": 0.0075
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 398,
+      "approvalRate": 0.1357,
+      "npaRate": 0.0176,
+      "npaUpper95": 0.0359,
+      "avgReportedAnr": 32.23,
+      "lent": 189750,
+      "profit": 16028.05,
+      "avgProfit": 40.27,
+      "simpleAnnual": 48.39,
+      "xirr": 47.47,
+      "expectedLossRate": 0.0097
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 544,
+      "approvalRate": 0.1854,
+      "npaRate": 0.0129,
+      "npaUpper95": 0.0263,
+      "avgReportedAnr": 32.53,
+      "lent": 449750,
+      "profit": 32437.38,
+      "avgProfit": 59.63,
+      "simpleAnnual": 54.09,
+      "xirr": 47.44,
+      "expectedLossRate": 0.0071
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 424,
+      "approvalRate": 0.1445,
+      "npaRate": 0.0236,
+      "npaUpper95": 0.0429,
+      "avgReportedAnr": 31.52,
+      "lent": 205000,
+      "profit": 18098.77,
+      "avgProfit": 42.69,
+      "simpleAnnual": 46.12,
+      "xirr": 45.96,
+      "expectedLossRate": 0.013
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 308,
+      "approvalRate": 0.105,
+      "npaRate": 0.0227,
+      "npaUpper95": 0.0462,
+      "avgReportedAnr": 32.05,
+      "lent": 158500,
+      "profit": 13733.92,
+      "avgProfit": 44.59,
+      "simpleAnnual": 42.62,
+      "xirr": 44.65,
+      "expectedLossRate": 0.0125
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 419,
+      "approvalRate": 0.1428,
+      "npaRate": 0.0167,
+      "npaUpper95": 0.0341,
+      "avgReportedAnr": 31.94,
+      "lent": 381500,
+      "profit": 26834.34,
+      "avgProfit": 64.04,
+      "simpleAnnual": 46.56,
+      "xirr": 44.5,
+      "expectedLossRate": 0.0092
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 910,
+      "approvalRate": 0.3102,
+      "npaRate": 0.0352,
+      "npaUpper95": 0.0492,
+      "avgReportedAnr": 28.56,
+      "lent": 697000,
+      "profit": 53558.35,
+      "avgProfit": 58.86,
+      "simpleAnnual": 39.46,
+      "xirr": 43.77,
+      "expectedLossRate": 0.0193
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 333,
+      "approvalRate": 0.1135,
+      "npaRate": 0.03,
+      "npaUpper95": 0.0544,
+      "avgReportedAnr": 31.13,
+      "lent": 173500,
+      "profit": 15750.8,
+      "avgProfit": 47.3,
+      "simpleAnnual": 40.95,
+      "xirr": 43.44,
+      "expectedLossRate": 0.0165
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 333,
+      "approvalRate": 0.1135,
+      "npaRate": 0.03,
+      "npaUpper95": 0.0544,
+      "avgReportedAnr": 31.13,
+      "lent": 173500,
+      "profit": 15750.8,
+      "avgProfit": 47.3,
+      "simpleAnnual": 40.95,
+      "xirr": 43.44,
+      "expectedLossRate": 0.0165
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 832,
+      "approvalRate": 0.2836,
+      "npaRate": 0.0337,
+      "npaUpper95": 0.0482,
+      "avgReportedAnr": 29.18,
+      "lent": 598500,
+      "profit": 44224.36,
+      "avgProfit": 53.15,
+      "simpleAnnual": 40.26,
+      "xirr": 42.4,
+      "expectedLossRate": 0.0185
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 749,
+      "approvalRate": 0.2553,
+      "npaRate": 0.0427,
+      "npaUpper95": 0.0597,
+      "avgReportedAnr": 27.4,
+      "lent": 608750,
+      "profit": 45222.31,
+      "avgProfit": 60.38,
+      "simpleAnnual": 34.83,
+      "xirr": 41.39,
+      "expectedLossRate": 0.0235
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 778,
+      "approvalRate": 0.2652,
+      "npaRate": 0.0308,
+      "npaUpper95": 0.0455,
+      "avgReportedAnr": 29.2,
+      "lent": 562250,
+      "profit": 39827.02,
+      "avgProfit": 51.19,
+      "simpleAnnual": 40.26,
+      "xirr": 41.37,
+      "expectedLossRate": 0.017
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 750,
+      "approvalRate": 0.2556,
+      "npaRate": 0.0427,
+      "npaUpper95": 0.0596,
+      "avgReportedAnr": 27.39,
+      "lent": 611750,
+      "profit": 45755.45,
+      "avgProfit": 61.01,
+      "simpleAnnual": 35,
+      "xirr": 41.32,
+      "expectedLossRate": 0.0235
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 674,
+      "approvalRate": 0.2297,
+      "npaRate": 0.0415,
+      "npaUpper95": 0.0594,
+      "avgReportedAnr": 28.09,
+      "lent": 515000,
+      "profit": 36861.99,
+      "avgProfit": 54.69,
+      "simpleAnnual": 35.28,
+      "xirr": 39.51,
+      "expectedLossRate": 0.0228
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 629,
+      "approvalRate": 0.2144,
+      "npaRate": 0.0382,
+      "npaUpper95": 0.0561,
+      "avgReportedAnr": 27.92,
+      "lent": 481750,
+      "profit": 32799.67,
+      "avgProfit": 52.15,
+      "simpleAnnual": 35.13,
+      "xirr": 38.25,
+      "expectedLossRate": 0.021
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 961,
+      "approvalRate": 0.3275,
+      "npaRate": 0.0312,
+      "npaUpper95": 0.0442,
+      "avgReportedAnr": 27.99,
+      "lent": 681000,
+      "profit": 40388.51,
+      "avgProfit": 42.03,
+      "simpleAnnual": 38.92,
+      "xirr": 38.04,
+      "expectedLossRate": 0.0172
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 1999,
+      "approvalRate": 0.6813,
+      "npaRate": 0.049,
+      "npaUpper95": 0.0594,
+      "avgReportedAnr": 27.38,
+      "lent": 1304000,
+      "profit": 93114.84,
+      "avgProfit": 46.58,
+      "simpleAnnual": 33.76,
+      "xirr": 37.49,
+      "expectedLossRate": 0.027
+    },
+    {
+      "minScore": 740,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 916,
+      "approvalRate": 0.3122,
+      "npaRate": 0.0382,
+      "npaUpper95": 0.0527,
+      "avgReportedAnr": 28.12,
+      "lent": 709250,
+      "profit": 47452.53,
+      "avgProfit": 51.8,
+      "simpleAnnual": 34.15,
+      "xirr": 37.28,
+      "expectedLossRate": 0.021
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 1752,
+      "approvalRate": 0.5971,
+      "npaRate": 0.0519,
+      "npaUpper95": 0.0633,
+      "avgReportedAnr": 26.78,
+      "lent": 1160250,
+      "profit": 81560.83,
+      "avgProfit": 46.55,
+      "simpleAnnual": 31.8,
+      "xirr": 36.54,
+      "expectedLossRate": 0.0286
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 1821,
+      "approvalRate": 0.6207,
+      "npaRate": 0.0467,
+      "npaUpper95": 0.0574,
+      "avgReportedAnr": 27.26,
+      "lent": 1156000,
+      "profit": 76824.97,
+      "avgProfit": 42.19,
+      "simpleAnnual": 32.79,
+      "xirr": 35.97,
+      "expectedLossRate": 0.0257
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 791,
+      "approvalRate": 0.2696,
+      "npaRate": 0.0341,
+      "npaUpper95": 0.0492,
+      "avgReportedAnr": 26.89,
+      "lent": 593250,
+      "profit": 33263.24,
+      "avgProfit": 42.05,
+      "simpleAnnual": 34.33,
+      "xirr": 35.06,
+      "expectedLossRate": 0.0188
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 1591,
+      "approvalRate": 0.5423,
+      "npaRate": 0.049,
+      "npaUpper95": 0.0608,
+      "avgReportedAnr": 26.59,
+      "lent": 1033000,
+      "profit": 67895.91,
+      "avgProfit": 42.67,
+      "simpleAnnual": 31.03,
+      "xirr": 35.03,
+      "expectedLossRate": 0.027
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2275,
+      "approvalRate": 0.7754,
+      "npaRate": 0.0532,
+      "npaUpper95": 0.0632,
+      "avgReportedAnr": 26.6,
+      "lent": 1502000,
+      "profit": 99323.99,
+      "avgProfit": 43.66,
+      "simpleAnnual": 30.93,
+      "xirr": 34.02,
+      "expectedLossRate": 0.0293
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 5,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 2016,
+      "approvalRate": 0.6871,
+      "npaRate": 0.0565,
+      "npaUpper95": 0.0675,
+      "avgReportedAnr": 25.95,
+      "lent": 1353000,
+      "profit": 87244.37,
+      "avgProfit": 43.28,
+      "simpleAnnual": 28.98,
+      "xirr": 32.81,
+      "expectedLossRate": 0.0311
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 1071,
+      "approvalRate": 0.365,
+      "npaRate": 0.0355,
+      "npaUpper95": 0.0483,
+      "avgReportedAnr": 27.24,
+      "lent": 767250,
+      "profit": 39387.06,
+      "avgProfit": 36.78,
+      "simpleAnnual": 32.96,
+      "xirr": 32.13,
+      "expectedLossRate": 0.0195
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2074,
+      "approvalRate": 0.7069,
+      "npaRate": 0.0516,
+      "npaUpper95": 0.062,
+      "avgReportedAnr": 26.32,
+      "lent": 1332000,
+      "profit": 79460.64,
+      "avgProfit": 38.31,
+      "simpleAnnual": 29.12,
+      "xirr": 31.69,
+      "expectedLossRate": 0.0284
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 1832,
+      "approvalRate": 0.6244,
+      "npaRate": 0.0546,
+      "npaUpper95": 0.066,
+      "avgReportedAnr": 25.57,
+      "lent": 1203750,
+      "profit": 70005.97,
+      "avgProfit": 38.21,
+      "simpleAnnual": 27.27,
+      "xirr": 30.43,
+      "expectedLossRate": 0.03
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2521,
+      "approvalRate": 0.8592,
+      "npaRate": 0.073,
+      "npaUpper95": 0.0838,
+      "avgReportedAnr": 24.49,
+      "lent": 1771750,
+      "profit": 113124.45,
+      "avgProfit": 44.87,
+      "simpleAnnual": 26.93,
+      "xirr": 29.88,
+      "expectedLossRate": 0.0401
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 3,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 896,
+      "approvalRate": 0.3054,
+      "npaRate": 0.0391,
+      "npaUpper95": 0.0538,
+      "avgReportedAnr": 26.11,
+      "lent": 677000,
+      "profit": 32077.71,
+      "avgProfit": 35.8,
+      "simpleAnnual": 28.5,
+      "xirr": 28.9,
+      "expectedLossRate": 0.0215
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 2248,
+      "approvalRate": 0.7662,
+      "npaRate": 0.0778,
+      "npaUpper95": 0.0897,
+      "avgReportedAnr": 23.74,
+      "lent": 1595500,
+      "profit": 97563.94,
+      "avgProfit": 43.4,
+      "simpleAnnual": 24.94,
+      "xirr": 28.76,
+      "expectedLossRate": 0.0428
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2874,
+      "approvalRate": 0.9796,
+      "npaRate": 0.0772,
+      "npaUpper95": 0.0876,
+      "avgReportedAnr": 24.03,
+      "lent": 2025000,
+      "profit": 125858.08,
+      "avgProfit": 43.79,
+      "simpleAnnual": 25.95,
+      "xirr": 28.64,
+      "expectedLossRate": 0.0425
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 2301,
+      "approvalRate": 0.7843,
+      "npaRate": 0.08,
+      "npaUpper95": 0.0918,
+      "avgReportedAnr": 23.35,
+      "lent": 1653250,
+      "profit": 101079.07,
+      "avgProfit": 43.93,
+      "simpleAnnual": 24.77,
+      "xirr": 28.44,
+      "expectedLossRate": 0.044
+    },
+    {
+      "minScore": 720,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2579,
+      "approvalRate": 0.879,
+      "npaRate": 0.076,
+      "npaUpper95": 0.0869,
+      "avgReportedAnr": 23.97,
+      "lent": 1838750,
+      "profit": 110000.62,
+      "avgProfit": 42.65,
+      "simpleAnnual": 25.04,
+      "xirr": 27.65,
+      "expectedLossRate": 0.0418
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 2589,
+      "approvalRate": 0.8824,
+      "npaRate": 0.0823,
+      "npaUpper95": 0.0935,
+      "avgReportedAnr": 23.3,
+      "lent": 1843500,
+      "profit": 109771.96,
+      "avgProfit": 42.4,
+      "simpleAnnual": 24.1,
+      "xirr": 27.5,
+      "expectedLossRate": 0.0452
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "salaried",
+      "loans": 2644,
+      "approvalRate": 0.9012,
+      "npaRate": 0.084,
+      "npaUpper95": 0.0951,
+      "avgReportedAnr": 22.95,
+      "lent": 1906250,
+      "profit": 113759.79,
+      "avgProfit": 43.03,
+      "simpleAnnual": 24.01,
+      "xirr": 27.35,
+      "expectedLossRate": 0.0462
+    },
+    {
+      "minScore": 760,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 429,
+      "approvalRate": 0.1462,
+      "npaRate": 0.0303,
+      "npaUpper95": 0.0512,
+      "avgReportedAnr": 30.58,
+      "lent": 214250,
+      "profit": 11459.81,
+      "avgProfit": 26.71,
+      "simpleAnnual": 27.67,
+      "xirr": 26.98,
+      "expectedLossRate": 0.0167
+    },
+    {
+      "minScore": 700,
+      "maxTenure": 12,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 2934,
+      "approvalRate": 1,
+      "npaRate": 0.0798,
+      "npaUpper95": 0.0901,
+      "avgReportedAnr": 23.59,
+      "lent": 2097000,
+      "profit": 123206.95,
+      "avgProfit": 41.99,
+      "simpleAnnual": 24.36,
+      "xirr": 26.83,
+      "expectedLossRate": 0.0439
+    }
+  ],
+  "policyGridSize": 200,
+  "recommendedPolicies": {
+    "balanced": {
+      "minScore": 740,
+      "maxTenure": 6,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 910,
+      "approvalRate": 0.3102,
+      "npaRate": 0.0352,
+      "npaUpper95": 0.0492,
+      "avgReportedAnr": 28.56,
+      "lent": 697000,
+      "profit": 53558.35,
+      "avgProfit": 58.86,
+      "simpleAnnual": 39.46,
+      "xirr": 43.77,
+      "expectedLossRate": 0.0193
+    },
+    "highestXirr": {
+      "minScore": 720,
+      "maxTenure": 2,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 403,
+      "approvalRate": 0.1374,
+      "npaRate": 0.005,
+      "npaUpper95": 0.0179,
+      "avgReportedAnr": 32.57,
+      "lent": 216500,
+      "profit": 12310.74,
+      "avgProfit": 30.55,
+      "simpleAnnual": 64.63,
+      "xirr": 61.66,
+      "expectedLossRate": 0.0027
+    },
+    "safest": {
+      "minScore": 760,
+      "maxTenure": 4,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 365,
+      "approvalRate": 0.1244,
+      "npaRate": 0.0137,
+      "npaUpper95": 0.0317,
+      "avgReportedAnr": 32.31,
+      "lent": 174250,
+      "profit": 13805.8,
+      "avgProfit": 37.82,
+      "simpleAnnual": 49,
+      "xirr": 47.74,
+      "expectedLossRate": 0.0075
+    },
+    "shortTenure": {
+      "minScore": 720,
+      "maxTenure": 2,
+      "maxFoir": 0.7,
+      "profession": "all",
+      "loans": 403,
+      "approvalRate": 0.1374,
+      "npaRate": 0.005,
+      "npaUpper95": 0.0179,
+      "avgReportedAnr": 32.57,
+      "lent": 216500,
+      "profit": 12310.74,
+      "avgProfit": 30.55,
+      "simpleAnnual": 64.63,
+      "xirr": 61.66,
+      "expectedLossRate": 0.0027
+    }
+  },
+  "notes": [
+    "Logistic scorecard trained on 2,934 closed loans; NPA is the target.",
+    "AUC around 0.60–0.65 is typical for thin-file consumer credit; treat this as directional, not production-grade.",
+    "Policy grid is in-sample and ignores approval elasticity, concentration limits and seasonality.",
+    "Features are standardised; coefficients are log-odds per 1 standard deviation."
+  ]
+}
