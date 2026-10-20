@@ -1071,7 +1071,7 @@ export function radarBook(o: { id: string; title: string; section: string; span?
       ];
       const series = gradeStats.slice(0, 3).map((s) => ({
         name: s.label,
-        value: [s.avgAnr, s.recoveryRate * 100, s.prepayRate, s.avgScore, 100 - s.npaRate],
+        value: [s.medianAnr, s.recoveryRate * 100, s.prepayRate, s.avgScore, 100 - s.npaRate],
         color: s.npaRate < 2 ? COLORS.emerald : s.npaRate < 5 ? COLORS.amber : COLORS.rose,
       }));
       const option = radarOption({ indicators, series });

@@ -594,7 +594,7 @@ export function numericBins(
     bin.lent = round(bin.lent, 2);
     bin.profit = round(bin.profit, 2);
     bin.badRate = bin.n ? round((bin.bad / bin.n) * 100, 2) : 0;
-    bin.avgAnr = anrBuckets[i].length ? round(mean(anrBuckets[i], (v) => v), 2) : 0;
+    bin.avgAnr = anrBuckets[i].length ? round(median(anrBuckets[i]), 2) : 0;
     bin.avgValue = bin.n ? round((bin.from + bin.to) / 2, 2) : 0;
     bin.ciLow = round(ci.low * 100, 2);
     bin.ciHigh = round(ci.high * 100, 2);
