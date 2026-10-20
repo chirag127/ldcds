@@ -11,6 +11,7 @@ import { Sidebar, TopBar } from './components/Shell';
 import { FilterPanel } from './components/FilterPanel';
 import { LoanDrawer } from './components/LoanDrawer';
 import { CommandPalette } from './components/CommandPalette';
+import { BUILD_ID } from './lib/version';
 
 function ScrollManager() {
   const location = useLocation();
@@ -76,7 +77,7 @@ function Layout() {
           </Routes>
           <footer className="site-foot">
             <span>
-              {chartCount()} charts · 16 tabs · 5,567 loans · as of 20 Oct 2026
+              {chartCount()} charts · 16 tabs · 5,567 loans · as of 20 Oct 2026 · build {BUILD_ID}
             </span>
             <span>
               Names published by design. PAN, phone, email, agreement links and investor PII removed. Not investment advice.
