@@ -70,7 +70,8 @@ export const METRICS: Record<string, MetricDef> = {
   npaRate: { label: 'NPA rate', kind: 'percent', higherIsBetter: false, get: (s) => s.npaRate, risk: true },
   badRate: { label: 'impairment rate', kind: 'percent', higherIsBetter: false, get: (s) => s.badRate, risk: true },
   anr: { label: 'reported ANR', kind: 'percent', higherIsBetter: true, get: (s) => s.avgAnr },
-  xirr: { label: 'money-weighted XIRR', kind: 'ratio', higherIsBetter: true, get: (s) => s.xirr ?? 0 },
+  // categoryStats/portfolioXirr already return percent, so don't treat as a ratio.
+  xirr: { label: 'money-weighted XIRR', kind: 'percent', higherIsBetter: true, get: (s) => s.xirr ?? 0 },
   ticket: { label: 'average ticket', kind: 'money', higherIsBetter: true, get: (s) => s.avgTicket },
   rate: { label: 'borrower APR', kind: 'percent', higherIsBetter: true, get: (s) => s.avgRate },
   tenure: { label: 'average tenure', kind: 'num', higherIsBetter: false, get: (s) => s.avgTenure, risk: true },
@@ -195,7 +196,14 @@ export function dimBar(o: DimBarOptions): ChartSpec {
           : undefined,
       };
     },
-    { subtitle: o.subtitle, note: o.note, span: o.span, height: o.height ?? 260 },
+    {
+      subtitle: o.subtitle ?? (o.metric === 'xirr'
+        ? 'All cash flows in the group, including projected receipts on active loans'
+        : undefined),
+      note: o.note,
+      span: o.span,
+      height: o.height ?? 260,
+    },
   );
 }
 
@@ -284,7 +292,13 @@ export function dimLine(o: {
         ),
       };
     },
-    { subtitle: o.subtitle, span: o.span ?? 2, height: o.height ?? 260 },
+    {
+      subtitle: o.subtitle ?? (o.metric === 'xirr'
+        ? 'All cash flows in the group, including projected receipts on active loans'
+        : undefined),
+      span: o.span ?? 2,
+      height: o.height ?? 260,
+    },
   );
 }
 

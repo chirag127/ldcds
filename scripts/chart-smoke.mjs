@@ -38,6 +38,18 @@ let failures = 0;
 let empty = 0;
 let total = 0;
 
+/** Every number inside the plotted series, including nested box/scatter data. */
+function seriesNumbers(option) {
+  const out = [];
+  const walk = (value) => {
+    if (typeof value === 'number') out.push(value);
+    else if (Array.isArray(value)) value.forEach(walk);
+    else if (value && typeof value === 'object') Object.values(value).forEach(walk);
+  };
+  for (const series of option?.series ?? []) walk(series.data);
+  return out;
+}
+
 for (const scenario of ['recovery', 'strict', 'contractual']) {
   for (const page of PAGES) {
     for (const section of page.sections) {
@@ -53,6 +65,14 @@ for (const scenario of ['recovery', 'strict', 'contractual']) {
             }
           }
           if (!result.insight?.headline) console.log(`NO INSIGHT ${scenario} ${page.id}/${spec.id}`);
+          // XIRR is already in percent; anything past 1500 is a ratio/percent
+          // scaling bug (the historical 100x inflation), not a real outcome.
+          const xirrSeries = (result.option?.series ?? []).filter((s) => /xirr/i.test(s?.name ?? ''));
+          if (xirrSeries.length) {
+            const values = xirrSeries.flatMap((s) => seriesNumbers({ series: [s] }));
+            const max = Math.max(0, ...values.map((v) => Math.abs(v)));
+            if (max > 1500) throw new Error(`implausible XIRR value ${max}`);
+          }
         } catch (err) {
           failures += 1;
           console.log(`FAIL ${scenario} ${page.id}/${spec.id}: ${err.message}`);
