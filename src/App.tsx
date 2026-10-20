@@ -83,7 +83,7 @@ function Layout() {
           </Routes>
           <footer className="site-foot">
             <span>
-              {chartCount()} charts · 16 tabs · 5,567 loans · as of 20 Oct 2026 · build {BUILD_ID}
+              {chartCount()} charts · 18 tabs · 5,567 loans · as of 20 Oct 2026 · build {BUILD_ID}
             </span>
             <span>
               Names published by design. PAN, phone, email, agreement links and investor PII removed. Not investment advice.

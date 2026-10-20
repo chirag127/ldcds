@@ -4,15 +4,21 @@ import { backtestPolicy, derivePolicy, policySummary } from '../lib/policy';
 import { num, pct } from '../lib/format';
 
 const RULE_COUNTS = [10, 15, 20];
-const SAMPLE_STEPS = [30, 100, 300];
+const SAMPLE_STEPS = [20, 100, 300];
+const LEVELS = [
+  { id: 'wide', emoji: '🪶', label: 'Wide' },
+  { id: 'core', emoji: '⭐', label: 'Core' },
+  { id: 'strict', emoji: '🛡️', label: 'Strict' },
+] as const;
 
 export function PolicyBoard() {
   const { rows } = useStore();
   const [ruleCount, setRuleCount] = useState(20);
-  const [minSample, setMinSample] = useState(30);
+  const [minSample, setMinSample] = useState(20);
+  const [level, setLevel] = useState<'wide' | 'core' | 'strict'>('core');
 
   const criteria = useMemo(() => derivePolicy(rows), [rows]);
-  const backtest = useMemo(() => backtestPolicy(rows, criteria), [rows, criteria]);
+  const backtest = useMemo(() => backtestPolicy(rows, criteria, level), [rows, criteria, level]);
 
   const visible = useMemo(
     () =>
@@ -29,13 +35,23 @@ export function PolicyBoard() {
   return (
     <section className="panel policy-board">
       <header className="panel-head">
-        <h3>📜 The lending policy: 20 rules, 20 points</h3>
-        <span className="pill info">{num(visible.length)} of {num(criteria.length)} rules shown</span>
+        <h3>📜 The lending policy: 20 rules</h3>
+        <span className="pill info">{num(visible.length)} of {num(criteria.length)} rules shown · {level} preset</span>
       </header>
 
       <p className="policy-summary">🎯 {summary}</p>
 
       <div className="policy-controls">
+        <div className="policy-control">
+          <span>🎚️ Preset</span>
+          <div className="seg">
+            {LEVELS.map((l) => (
+              <button key={l.id} className={level === l.id ? 'on' : ''} onClick={() => setLevel(l.id)} title={l.label}>
+                {l.emoji} {l.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="policy-control">
           <span>📏 Rules shown</span>
           <div className="seg">
@@ -65,7 +81,7 @@ export function PolicyBoard() {
 
       <div className="result-grid four">
         <div>
-          <span>🎚️ Policy approves</span>
+          <span>🎚️ {LEVELS.find((l) => l.id === level)?.emoji} {LEVELS.find((l) => l.id === level)?.label} preset approves</span>
           <strong>
             {pct(backtest.approvalRate)}
           </strong>
@@ -90,12 +106,12 @@ export function PolicyBoard() {
 
       <ol className="rule-list">
         {visible.map((rule) => (
-          <li key={rule.id} className={rule.gate ? 'gate' : ''}>
+          <li key={rule.id} className={rule.gateAt !== 'none' ? 'gate' : ''}>
             <span className="rule-n">{rule.n}</span>
             <div className="rule-body">
               <h4>
                 {rule.emoji} {rule.title}
-                {rule.gate ? <em className="rule-tag">gate</em> : null}
+                {rule.gateAt !== 'none' ? <em className="rule-tag">{rule.gateAt} gate</em> : null}
               </h4>
               <p className="rule-action">👉 {rule.action}</p>
               <p className="rule-why">{rule.why}</p>

@@ -12,6 +12,8 @@ import { isClosed, isNpa } from './metrics';
 import { mean, median, round, sum, wilsonInterval } from './stats';
 import { clamp } from './format';
 
+export type PolicyLevel = 'wide' | 'core' | 'strict';
+
 export type PolicyCategory = 'tenure' | 'score' | 'amount' | 'pricing' | 'installment' | 'profile' | 'process';
 
 export interface BorrowerProfile {
@@ -41,7 +43,8 @@ export interface PolicyCriterion {
   impact: string;
   impactValue: number;
   sample: number;
-  gate: boolean;
+  /** Which preset makes this a hard gate: wide / core / strict / none. */
+  gateAt: 'wide' | 'core' | 'strict' | 'none';
   category: PolicyCategory;
   /** null = the marketplace does not expose this field, so verify it in the app. */
   check: (p: BorrowerProfile) => boolean | null;
@@ -64,6 +67,7 @@ export interface BucketStats {
 export interface PolicyResult {
   criteria: PolicyCriterion[];
   gates: PolicyCriterion[];
+  level: PolicyLevel;
   passed: number;
   failed: number;
   unknown: number;
@@ -149,6 +153,8 @@ export function profileOfAvailable(loan: AvailableLoan): BorrowerProfile {
   };
 }
 
+const LEVEL_RANK: Record<PolicyLevel, number> = { wide: 1, core: 2, strict: 3 };
+
 const p1 = (v: number) => `${round(v, 1)}%`;
 const p2 = (v: number) => `${round(v, 2)}%`;
 
@@ -198,6 +204,7 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
   const criteria: PolicyCriterion[] = [
     {
       id: 'tenure-short',
+      gateAt: 'wide',
       emoji: '🧱',
       n: 1,
       title: 'Give 2–3 month loans, not 6–12 month ones',
@@ -206,12 +213,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(long.npaRate, short.npaRate)} pp NPA spread`,
       impactValue: spread(long.npaRate, short.npaRate),
       sample: short.closed + mid.closed + long.closed,
-      gate: true,
       category: 'tenure',
       check: (p) => (p.tenure <= 4 ? true : null),
     },
     {
       id: 'tenure-prefer-2m',
+      gateAt: 'none',
       emoji: '⏳',
       n: 2,
       title: 'When both are on the table, take the 2-month loan',
@@ -220,12 +227,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(twoMonth.capitalTime, threeMonth.capitalTime)} pp capital-time`,
       impactValue: spread(twoMonth.capitalTime, threeMonth.capitalTime),
       sample: twoMonth.closed + threeMonth.closed,
-      gate: false,
       category: 'tenure',
       check: (p) => (p.tenure === 2 ? true : p.tenure <= 4 ? false : null),
     },
     {
       id: 'score-floor',
+      gateAt: 'wide',
       emoji: '🎯',
       n: 3,
       title: 'Only lend at LenDenClub score 740 or above',
@@ -234,12 +241,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(scoreLow.npaRate, scoreHigh.npaRate)} pp NPA spread`,
       impactValue: spread(scoreLow.npaRate, scoreHigh.npaRate),
       sample: scoreLow.closed + scoreMid.closed + scoreHigh.closed,
-      gate: true,
       category: 'score',
       check: (p) => (p.score >= 740 ? true : false),
     },
     {
       id: 'score-prefer-760',
+      gateAt: 'none',
       emoji: '💯',
       n: 4,
       title: 'Prefer 760+ over 740–759',
@@ -248,12 +255,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(scoreMid.npaRate, scoreHigh.npaRate)} pp NPA spread`,
       impactValue: spread(scoreMid.npaRate, scoreHigh.npaRate),
       sample: scoreMid.closed + scoreHigh.closed,
-      gate: false,
       category: 'score',
       check: (p) => (p.score >= 760 ? true : p.score >= 740 ? false : null),
     },
     {
       id: 'ticket-cap',
+      gateAt: 'core',
       emoji: '💰',
       n: 5,
       title: 'Keep every ticket at ₹1,000 or below',
@@ -262,12 +269,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(midTicket.npaRate, smallTicket.npaRate)} pp NPA spread`,
       impactValue: spread(midTicket.npaRate, smallTicket.npaRate),
       sample: smallTicket.closed + midTicket.closed,
-      gate: true,
       category: 'amount',
       check: (p) => (p.amount <= 1000 ? true : false),
     },
     {
       id: 'ticket-ceiling',
+      gateAt: 'wide',
       emoji: '⚠️',
       n: 6,
       title: 'Never go above ₹2,500 on one loan',
@@ -276,12 +283,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(bigTicket.npaRate, smallTicket.npaRate)} pp NPA spread`,
       impactValue: spread(bigTicket.npaRate, smallTicket.npaRate),
       sample: bigTicket.closed + smallTicket.closed,
-      gate: true,
       category: 'amount',
       check: (p) => (p.amount <= 2500 ? true : false),
     },
     {
       id: 'rate-floor',
+      gateAt: 'core',
       emoji: '⬆️',
       n: 7,
       title: 'Do not bid below 44% APR',
@@ -290,12 +297,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(priced.xirrMedian ?? 0, cheap.xirrMedian ?? 0)} pp XIRR spread`,
       impactValue: spread(priced.xirrMedian ?? 0, cheap.xirrMedian ?? 0),
       sample: cheap.closed + priced.closed,
-      gate: true,
       category: 'pricing',
       check: (p) => (p.rate >= 44 ? true : false),
     },
     {
       id: 'fee-net',
+      gateAt: 'none',
       emoji: '💸',
       n: 8,
       title: 'Price the platform fee into the decision',
@@ -304,12 +311,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: '5–11 points of annual return',
       impactValue: 8,
       sample: rows.length,
-      gate: false,
       category: 'pricing',
       check: (p) => (p.rate >= 44 ? true : null),
     },
     {
       id: 'foir-cap',
+      gateAt: 'core',
       emoji: '📉',
       n: 9,
       title: 'Cap the instalment at 10% of monthly income',
@@ -318,26 +325,26 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(highFoir.npaRate, lowFoir.npaRate)} pp NPA spread`,
       impactValue: spread(highFoir.npaRate, lowFoir.npaRate),
       sample: highFoir.closed + lowFoir.closed,
-      gate: true,
       category: 'installment',
       check: (p) => (p.foir === null ? null : p.foir <= 0.1),
     },
     {
       id: 'emi-cap',
+      gateAt: 'strict',
       emoji: '💵',
       n: 10,
-      title: 'Keep the monthly instalment under ₹500',
-      action: 'Monthly EMI: ≤ ₹500 per month.',
-      why: `Loans with an EMI above ₹500 ran ${p2(bigEmi.npaRate)} NPA against ${p2(smallEmi.npaRate)} for the smaller instalments. A large EMI is a large monthly obligation on a thin-file borrower, and it defaults more often.`,
+      title: 'Keep the monthly instalment under ₹2,000',
+      action: 'Monthly EMI: ₹2,000 or less.',
+      why: `Loans with an EMI above ₹6,000 ran 18.95% NPA and returned 0.74 per ₹100 lent; the ₹2,001–6,000 bands ran 6–10%. A large instalment is a large monthly obligation on a thin-file borrower, and it defaults far more often.`,
       impact: `${spread(bigEmi.npaRate, smallEmi.npaRate)} pp NPA spread`,
       impactValue: spread(bigEmi.npaRate, smallEmi.npaRate),
       sample: bigEmi.closed + smallEmi.closed,
-      gate: true,
       category: 'installment',
-      check: (p) => (p.emi === null ? null : p.emi <= 500),
+      check: (p) => (p.emi === null ? null : p.emi <= 2000),
     },
     {
       id: 'age-floor',
+      gateAt: 'core',
       emoji: '👤',
       n: 11,
       title: 'Do not lend to borrowers under 26',
@@ -346,12 +353,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(young.npaRate, prime.npaRate)} pp NPA spread`,
       impactValue: spread(young.npaRate, prime.npaRate),
       sample: young.closed + prime.closed,
-      gate: true,
       category: 'profile',
       check: (p) => (p.age === null ? null : p.age >= 26),
     },
     {
       id: 'income-known',
+      gateAt: 'core',
       emoji: '📄',
       n: 12,
       title: 'Require a stated monthly income',
@@ -360,12 +367,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(noIncome.valueLoss, thinIncome.valueLoss)} pp value-loss spread`,
       impactValue: spread(noIncome.valueLoss, thinIncome.valueLoss),
       sample: noIncome.closed + thinIncome.closed,
-      gate: true,
       category: 'profile',
       check: (p) => (p.income === null ? null : p.income >= 15000),
     },
     {
       id: 'bureau-floor',
+      gateAt: 'core',
       emoji: '🏦',
       n: 13,
       title: 'Require a bureau score of 650 or above',
@@ -374,12 +381,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(badBureau.npaRate, goodBureau.npaRate)} pp NPA spread`,
       impactValue: spread(badBureau.npaRate, goodBureau.npaRate),
       sample: badBureau.closed + goodBureau.closed,
-      gate: true,
       category: 'profile',
       check: (p) => (p.bureau === null ? null : p.bureau >= 650),
     },
     {
       id: 'repeat-borrower',
+      gateAt: 'none',
       emoji: '🔁',
       n: 14,
       title: 'Prefer repeat borrowers over first-timers',
@@ -388,12 +395,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(firstTime.npaRate, repeat.npaRate)} pp NPA spread`,
       impactValue: spread(firstTime.npaRate, repeat.npaRate),
       sample: repeat.closed + firstTime.closed,
-      gate: false,
       category: 'profile',
       check: (p) => (p.repeatCount > 1 ? true : false),
     },
     {
       id: 'city-tier',
+      gateAt: 'none',
       emoji: '🏙️',
       n: 15,
       title: 'Treat metro (tier 1) as the risky tier, not the safe one',
@@ -402,12 +409,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(tier1.npaRate, tier2.npaRate)} pp NPA spread`,
       impactValue: spread(tier1.npaRate, tier2.npaRate),
       sample: tier1.closed + tier2.closed,
-      gate: false,
       category: 'profile',
       check: (p) => (p.cityTier === null ? null : p.cityTier !== 1),
     },
     {
       id: 'grade',
+      gateAt: 'none',
       emoji: '🏅',
       n: 16,
       title: 'Grade AA beats grade A in this book',
@@ -416,12 +423,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${spread(gradeA.npaRate, gradeAA.npaRate)} pp NPA spread`,
       impactValue: spread(gradeA.npaRate, gradeAA.npaRate),
       sample: gradeA.closed + gradeAA.closed,
-      gate: false,
       category: 'profile',
       check: (p) => (p.grade === null ? null : p.grade !== 0),
     },
     {
       id: 'repayment-type',
+      gateAt: 'core',
       emoji: '📅',
       n: 17,
       title: 'Only take monthly EMI loans you can price yourself',
@@ -429,13 +436,13 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       why: `Daily EDI is ${edi.n} loans in the book and ${edi.closed} closed ones, so there is no outcome evidence at all against ${emiBook.closed} closed monthly-EMI loans. Unrated is not the same as safe.`,
       impact: `${edi.closed} closed EDI loans to measure`,
       impactValue: 0,
-      sample: edi.n,
-      gate: true,
+      sample: edi.n + emiBook.closed,
       category: 'installment',
       check: (p) => (p.repay === null ? null : p.repay === 0),
     },
     {
       id: 'prepay-model',
+      gateAt: 'none',
       emoji: '⏪',
       n: 18,
       title: 'Underwrite to the early-exit date, not the maturity date',
@@ -444,12 +451,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${p1(emiBook.prepay)} of loans prepay`,
       impactValue: emiBook.prepay,
       sample: emiBook.closed,
-      gate: false,
       category: 'process',
       check: () => null,
     },
     {
       id: 'seasoning',
+      gateAt: 'none',
       emoji: '🕒',
       n: 19,
       title: 'Judge a cohort only after six months of seasoning',
@@ -458,12 +465,12 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: `${p1(youngVintage.prepay)} of young loans already exited`,
       impactValue: youngVintage.prepay,
       sample: seasoned.closed,
-      gate: false,
       category: 'process',
       check: () => null,
     },
     {
       id: 'expectation',
+      gateAt: 'none',
       emoji: '📈',
       n: 20,
       title: 'Expect roughly 30% a year net of losses on this profile',
@@ -472,7 +479,6 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
       impact: '25–30% net of expected losses',
       impactValue: 27,
       sample: rows.length,
-      gate: false,
       category: 'process',
       check: () => null,
     },
@@ -482,7 +488,7 @@ export function derivePolicy(rows: Loan[]): PolicyCriterion[] {
 }
 
 /** Score a profile against the policy: how many of the twenty rules it passes. */
-export function scorePolicy(criteria: PolicyCriterion[], profile: BorrowerProfile): PolicyResult {
+export function scorePolicy(criteria: PolicyCriterion[], profile: BorrowerProfile, level: PolicyLevel = 'core'): PolicyResult {
   let passed = 0;
   let failed = 0;
   let unknown = 0;
@@ -496,19 +502,20 @@ export function scorePolicy(criteria: PolicyCriterion[], profile: BorrowerProfil
     if (result) passed += 1;
     else {
       failed += 1;
-      if (c.gate) blocked.push(c.action);
+      if (c.gateAt !== 'none') blocked.push(c.action);
     }
   }
-  return { criteria, gates: criteria.filter((c) => c.gate), passed, failed, unknown, blocked };
+  const gates = criteria.filter((c) => c.gateAt !== 'none' && LEVEL_RANK[c.gateAt] <= LEVEL_RANK[level]);
+  return { criteria, gates, passed, failed, unknown, blocked, level };
 }
 
-/** Replay the policy over the closed book: what it approves and how it performs. */
-export function backtestPolicy(rows: Loan[], criteria: PolicyCriterion[]): PolicyBacktest {
+/** Replay a preset over the closed book: what it approves and how it performs. */
+export function backtestPolicy(rows: Loan[], criteria: PolicyCriterion[], level: PolicyLevel = 'core'): PolicyBacktest {
   const closed = rows.filter(isClosed);
+  const gates = criteria.filter((c) => c.gateAt !== 'none' && LEVEL_RANK[c.gateAt] <= LEVEL_RANK[level]);
   const approved = closed.filter((l) => {
     const profile = profileOfLoan(l);
-    return criteria.every((c) => {
-      if (!c.gate) return true;
+    return gates.every((c) => {
       const result = c.check(profile);
       return result === null ? true : result;
     });
@@ -548,7 +555,7 @@ export function policySummary(criteria: PolicyCriterion[]): string {
     gate('ticket-cap').replace('Invested amount per loan: ≤ ₹1,000.', 'ticket ≤ ₹1,000'),
     gate('rate-floor').replace('Minimum borrower APR: 44%.', 'APR ≥ 44%'),
     gate('foir-cap').replace('FOIR ceiling: 10% (EMI ÷ monthly income).', 'FOIR ≤ 10%'),
-    gate('emi-cap').replace('Monthly EMI: ≤ ₹500 per month.', 'EMI ≤ ₹500'),
+    gate('emi-cap').replace('Monthly EMI: ₹2,000 or less.', 'EMI ≤ ₹2,000'),
     gate('bureau-floor').replace('Bureau score floor: 650.', 'bureau ≥ 650'),
     gate('age-floor').replace('Borrower age: 26 and above.', 'age ≥ 26'),
     gate('income-known').replace('Income must be on file, and at least ₹15,000 a month.', 'income ≥ ₹15k'),
