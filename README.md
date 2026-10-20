@@ -185,6 +185,13 @@ Source: GitHub Actions**, then push to `main`.
 
 ## Known limitations
 
+- Charts mount only when they scroll near the viewport (IntersectionObserver).
+  In a background or headless tab nothing ever intersects, so no canvas is
+  painted — the card content itself is still built and checked by
+  `npm run charts:smoke` and `npm run charts:audit`.
+- The footer carries a build stamp (`build 2026-10-21b`). If a reader sees an
+  older stamp, the browser is serving a cached bundle — hard-refresh.
+
 - The export has no instalment dates; XIRR dates closed inflows at closure and
   active inflows at the as-of date. Treat XIRR as directional.
 - DPD is a point-in-time snapshot. Strict write-off is deliberately harsh.
