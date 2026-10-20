@@ -253,21 +253,21 @@
     "auc": 0.7443,
     "gini": 0.4886,
     "ks": 0.415,
-    "accuracy": 0.6577,
-    "precision": 0.1728,
-    "recall": 0.7368,
-    "f1": 0.28,
-    "logLoss": 0.608,
-    "brier": 0.213,
-    "cvAuc": 0.7185,
+    "accuracy": 0.7163,
+    "precision": 0.1789,
+    "recall": 0.5965,
+    "f1": 0.2753,
+    "logLoss": 0.2757,
+    "brier": 0.0785,
+    "cvAuc": 0.7169,
     "cvFolds": 5,
     "trainSize": 2303,
     "testSize": 631,
     "confusion": {
-      "tp": 42,
-      "fp": 201,
-      "fn": 15,
-      "tn": 373
+      "tp": 34,
+      "fp": 156,
+      "fn": 23,
+      "tn": 418
     }
   },
   "roc": [
@@ -721,65 +721,73 @@
   "calibration": [
     {
       "bin": 1,
-      "predicted": 0.0405,
+      "predicted": 0.0077,
       "actual": 0,
       "count": 64
     },
     {
       "bin": 2,
-      "predicted": 0.198,
+      "predicted": 0.0303,
       "actual": 0.0313,
       "count": 64
     },
     {
       "bin": 3,
-      "predicted": 0.2857,
+      "predicted": 0.0434,
       "actual": 0.0469,
       "count": 64
     },
     {
       "bin": 4,
-      "predicted": 0.3528,
+      "predicted": 0.0544,
       "actual": 0.0156,
       "count": 64
     },
     {
       "bin": 5,
-      "predicted": 0.4088,
+      "predicted": 0.0646,
       "actual": 0.0625,
       "count": 64
     },
     {
       "bin": 6,
-      "predicted": 0.4634,
+      "predicted": 0.0758,
       "actual": 0.0781,
       "count": 64
     },
     {
       "bin": 7,
-      "predicted": 0.5314,
+      "predicted": 0.0919,
       "actual": 0.1406,
       "count": 64
     },
     {
       "bin": 8,
-      "predicted": 0.6057,
+      "predicted": 0.1134,
       "actual": 0.125,
       "count": 64
     },
     {
       "bin": 9,
-      "predicted": 0.6705,
+      "predicted": 0.1371,
       "actual": 0.1875,
       "count": 64
     },
     {
       "bin": 10,
-      "predicted": 0.778,
+      "predicted": 0.2078,
       "actual": 0.2364,
       "count": 55
     }
   ],
+  "platt": {
+    "a": 0.770056,
+    "b": -2.389575,
+    "meanPredicted": 0.0809,
+    "meanActual": 0.0903,
+    "baseRate": 0.0798,
+    "threshold": 0.1
+  },
   "woe": [
     {
       "key": "score",
@@ -2124,6 +2132,7 @@
     "Logistic scorecard trained on 2,934 closed loans; NPA is the target.",
     "AUC around 0.60–0.65 is typical for thin-file consumer credit; treat this as directional, not production-grade.",
     "Policy grid is in-sample and ignores approval elasticity, concentration limits and seasonality.",
-    "Features are standardised; coefficients are log-odds per 1 standard deviation."
+    "Features are standardised; coefficients are log-odds per 1 standard deviation.",
+    "Training used class-balanced weights, so raw scores are not probabilities. Platt scaling on out-of-fold predictions maps them onto the real base rate — always read the calibrated number."
   ]
 }

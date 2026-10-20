@@ -155,8 +155,9 @@ const executive: PageConfig = {
   title: 'Executive',
   eyebrow: 'Command centre',
   description:
-    'One page for the whole book: what is deployed, what came back, what is impaired, and which cut of the data actually earns its risk.',
+    'One page for the whole book: what is deployed, what came back, what is impaired, which cut of the data actually earns its risk, and which live loans to fund today.',
   heroKpis: baseKpis,
+  custom: 'executive',
   sections: groupSections('exec', [
     K.gaugeChart({
       id: 'exec-gauge-anr',
@@ -721,7 +722,7 @@ const scorecard: PageConfig = {
   title: 'Scorecard',
   eyebrow: 'Research model',
   description:
-    'A logistic scorecard trained on closed loans to rank risk. AUC 0.744 with 5-fold CV at 0.719 — useful for ranking, not for pricing without human review.',
+    'A logistic scorecard trained on closed loans to rank risk. AUC 0.744 with 5-fold CV at 0.719 — useful for ranking, not for pricing without human review. Class-balanced training inflates the raw score, so every probability here is rescaled onto the book\'s real base rate.',
   heroKpis: (_rows, ctx) => [
     { label: 'Model AUC', value: ctx.model.metrics.auc.toFixed(3), hint: `CV ${ctx.model.metrics.cvAuc.toFixed(3)}`, tone: 'good' },
     { label: 'KS statistic', value: ctx.model.metrics.ks.toFixed(3), hint: 'separation' },
@@ -729,6 +730,12 @@ const scorecard: PageConfig = {
     { label: 'Observations', value: num(ctx.model.observations), hint: `${num(ctx.model.events)} events` },
     { label: 'Event rate', value: pct(ctx.model.eventRate * 100), hint: 'closed-loan NPA' },
     { label: 'Brier score', value: ctx.model.metrics.brier.toFixed(3), hint: 'lower is better' },
+    {
+      label: 'Mean predicted PD',
+      value: pct(ctx.model.platt.meanPredicted * 100),
+      hint: `actual ${pct(ctx.model.platt.meanActual * 100)} after calibration`,
+      tone: 'good',
+    },
   ],
   sections: groupSections('scorecard', [
     K.rocChart({ id: 'sc-roc', title: 'ROC curve', section: 'Model quality' }),
@@ -744,7 +751,7 @@ const scorecard: PageConfig = {
     }),
     K.liftChart({ id: 'sc-lift', title: 'Decile lift', section: 'Model quality' }),
     K.calibrationChart({ id: 'sc-calibration', title: 'Calibration: predicted versus actual', section: 'Model quality' }),
-    K.confusionHeat({ id: 'sc-confusion', title: 'Confusion matrix at 0.5 threshold', section: 'Model quality' }),
+    K.confusionHeat({ id: 'sc-confusion', title: 'Confusion matrix at a 10% default threshold', section: 'Model quality' }),
     K.metricsBars({ id: 'sc-metrics', title: 'Classification metrics', section: 'Model quality' }),
     K.coefficientBars({ id: 'sc-coef', title: 'Standardised coefficients', section: 'Model mechanics' }),
     K.ivBars({ id: 'sc-iv', title: 'Information value by feature', section: 'Model mechanics' }),
@@ -1330,8 +1337,92 @@ const methodology: PageConfig = {
   ]),
 };
 
+// ---------------------------------------------------------------------------
+// 17. Policy — the 20 rules (guidance, not scoring)
+// ---------------------------------------------------------------------------
+const policy: PageConfig = {
+  id: 'policy',
+  title: 'Policy',
+  eyebrow: 'How to lend',
+  description:
+    'Twenty rules that decide which loans to give and which to leave alone, each one built from this book’s own outcomes. Rules are guidance for your next bid — they are not applied to any live loan.',
+  custom: 'policy',
+  heroKpis: (_rows) => [
+    { label: 'Rules', value: '20', hint: 'one point each', tone: 'good' },
+    { label: 'Gates', value: '12', hint: 'must pass to fund', tone: 'neutral' },
+    { label: 'Evidence base', value: num(_rows.length), hint: 'loans behind the numbers', tone: 'neutral' },
+  ],
+  sections: [],
+};
+
+// ---------------------------------------------------------------------------
+// 18. Best — prefer/avoid across every dimension, raw beside annualised
+// ---------------------------------------------------------------------------
+const best: PageConfig = {
+  id: 'best',
+  title: 'Best',
+  eyebrow: 'Ranking',
+  description:
+    'Which loans to give and which to leave alone, measured on one clock. Raw NPA is shown beside the annualised default rate, so a 2-month loan and a 12-month loan are compared fairly — and capital-time return is shown next to the risk that buys it.',
+  heroKpis: (_rows) => [
+    { label: 'Loans in view', value: num(_rows.length), hint: 'closed loans carry the outcomes', tone: 'neutral' },
+    { label: 'Book NPA', value: pct((_rows.filter(isNpa).length / Math.max(1, _rows.filter((l) => l.status !== 0).length)) * 100), hint: 'raw share of closed loans', tone: 'bad' },
+    { label: 'Book capital-time', value: pct(_rows.filter(isClosed).length ? (_rows.filter(isClosed).reduce((s, l) => s + l.netProfit, 0) / _rows.filter(isClosed).reduce((s, l) => s + l.amount * l.holdingDays, 0)) * 365 * 100 : 0), hint: 'annualised on capital at risk', tone: 'good' },
+  ],
+  sections: groupSections('best', [
+    K.hazardBars({ id: 'best-tenure-hazard', title: 'Tenure: raw NPA beside annualised risk', section: 'Tenure on one clock', dim: 'tenure' }),
+    K.hazardLine({ id: 'best-tenure-hazard-line', title: 'Defaults per 1,000 loan-months by tenure', section: 'Tenure on one clock', dim: 'tenure' }),
+    K.seasoningHazard({ id: 'best-seasoning', title: 'Cumulative NPA as cohorts age', section: 'Tenure on one clock' }),
+    K.dimBar({ id: 'best-tenure-capital', title: 'Capital-time return by tenure', section: 'Tenure on one clock', dim: 'tenure', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-tenure-per100', title: 'Profit per ₹100 lent by tenure', section: 'Tenure on one clock', dim: 'tenure', metric: 'per100' }),
+    K.dimBar({ id: 'best-tenure-xirr', title: 'Money-weighted XIRR by tenure', section: 'Tenure on one clock', dim: 'tenure', metric: 'xirr' }),
+    K.dimBar({ id: 'best-tenure-prepay', title: 'Prepayment rate by tenure', section: 'Tenure on one clock', dim: 'tenure', metric: 'prepay' }),
+    K.dimBar({ id: 'best-tenure-n', title: 'Loan count by tenure', section: 'Tenure on one clock', dim: 'tenure', metric: 'n' }),
+    K.tenureHeat({ id: 'best-tenure-heat', title: 'Impairment by month and tenure', section: 'Tenure on one clock' }),
+
+    K.hazardBars({ id: 'best-score-hazard', title: 'LenDenClub score: raw NPA beside annualised risk', section: 'Score bands', dim: 'scoreBand' }),
+    K.hazardLine({ id: 'best-score-hazard-line', title: 'Defaults per 1,000 loan-months by score', section: 'Score bands', dim: 'scoreBand' }),
+    K.hazardBars({ id: 'best-score-fine', title: 'Score in 5-point steps: NPA beside annualised', section: 'Score bands', dim: 'scoreFine' }),
+    K.dimBar({ id: 'best-score-capital', title: 'Capital-time return by score band', section: 'Score bands', dim: 'scoreBand', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-score-per100', title: 'Profit per ₹100 by score band', section: 'Score bands', dim: 'scoreBand', metric: 'per100' }),
+    K.dimBar({ id: 'best-score-xirr', title: 'Money-weighted XIRR by score band', section: 'Score bands', dim: 'scoreBand', metric: 'xirr' }),
+    K.dimBar({ id: 'best-score-median-anr', title: 'Median reported ANR by score band', section: 'Score bands', dim: 'scoreBand', metric: 'anr' }),
+
+    K.hazardBars({ id: 'best-bureau-hazard', title: 'Bureau score: raw NPA beside annualised risk', section: 'Bureau score', dim: 'bureauBand' }),
+    K.hazardLine({ id: 'best-bureau-hazard-line', title: 'Defaults per 1,000 loan-months by bureau', section: 'Bureau score', dim: 'bureauBand' }),
+    K.dimBar({ id: 'best-bureau-capital', title: 'Capital-time return by bureau band', section: 'Bureau score', dim: 'bureauBand', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-bureau-per100', title: 'Profit per ₹100 by bureau band', section: 'Bureau score', dim: 'bureauBand', metric: 'per100' }),
+
+    K.hazardBars({ id: 'best-amount-hazard', title: 'Your ticket: raw NPA beside annualised risk', section: 'Ticket and instalment', dim: 'amountBand' }),
+    K.hazardBars({ id: 'best-sanctioned-hazard', title: 'Borrower loan size: raw NPA beside annualised risk', section: 'Ticket and instalment', dim: 'borrowerAmountBand' }),
+    K.hazardBars({ id: 'best-emi-hazard', title: 'Monthly EMI: raw NPA beside annualised risk', section: 'Ticket and instalment', dim: 'emiBand' }),
+    K.hazardBars({ id: 'best-foir-hazard', title: 'FOIR: raw NPA beside annualised risk', section: 'Ticket and instalment', dim: 'foirBand' }),
+    K.dimBar({ id: 'best-sanctioned-capital', title: 'Capital-time return by borrower loan size', section: 'Ticket and instalment', dim: 'borrowerAmountBand', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-sanctioned-per100', title: 'Profit per ₹100 by borrower loan size', section: 'Ticket and instalment', dim: 'borrowerAmountBand', metric: 'per100' }),
+    K.dimBar({ id: 'best-emi-capital', title: 'Capital-time return by EMI', section: 'Ticket and instalment', dim: 'emiBand', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-amount-xirr', title: 'Money-weighted XIRR by your ticket', section: 'Ticket and instalment', dim: 'amountBand', metric: 'xirr' }),
+
+    K.hazardBars({ id: 'best-age-hazard', title: 'Borrower age: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'ageBand' }),
+    K.hazardBars({ id: 'best-income-hazard', title: 'Monthly income: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'incomeBand' }),
+    K.hazardBars({ id: 'best-profession-hazard', title: 'Borrower type: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'profession' }),
+    K.hazardBars({ id: 'best-tier-hazard', title: 'City tier: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'cityTier' }),
+    K.hazardBars({ id: 'best-grade-hazard', title: 'Risk grade: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'grade' }),
+    K.hazardBars({ id: 'best-repay-hazard', title: 'Repayment type: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'repay' }),
+    K.hazardBars({ id: 'best-repeat-hazard', title: 'Repeat borrower: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'repeat' }),
+    K.hazardBars({ id: 'best-vintage-hazard', title: 'Vintage: raw NPA beside annualised risk', section: 'Borrower profile', dim: 'vintageBand' }),
+    K.dimBar({ id: 'best-age-per100', title: 'Profit per ₹100 by age band', section: 'Borrower profile', dim: 'ageBand', metric: 'per100' }),
+    K.dimBar({ id: 'best-income-capital', title: 'Capital-time return by income', section: 'Borrower profile', dim: 'incomeBand', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-profession-capital', title: 'Capital-time return by borrower type', section: 'Borrower profile', dim: 'profession', metric: 'capitalTime' }),
+    K.dimBar({ id: 'best-tier-per100', title: 'Profit per ₹100 by city tier', section: 'Borrower profile', dim: 'cityTier', metric: 'per100' }),
+    K.dimBar({ id: 'best-vintage-npa', title: 'Raw NPA by vintage', section: 'Borrower profile', dim: 'vintageBand', metric: 'npaRate' }),
+    K.dimBar({ id: 'best-vintage-hazard', title: 'Annualised risk by vintage', section: 'Borrower profile', dim: 'vintageBand', metric: 'hazardAnnual' }),
+  ]),
+};
+
 export const PAGES: PageConfig[] = [
   executive,
+  best,
+  policy,
   portfolio,
   returns,
   activeBook,

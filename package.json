@@ -7,6 +7,7 @@
   "scripts": {
     "data:build": "node scripts/build-data.mjs",
     "data:verify": "node scripts/verify-data.mjs",
+    "loans:report": "rolldown scripts/loans-to-fund.mjs --format esm --platform node -d .tmp && node .tmp/loans-to-fund.js",
     "charts:count": "rolldown scripts/chart-count.mjs --format esm --platform node -d .tmp && node .tmp/chart-count.js",
     "charts:dupes": "rolldown scripts/chart-dupes.mjs --format esm --platform node -d .tmp && node .tmp/chart-dupes.js",
     "charts:smoke": "rolldown scripts/chart-smoke.mjs --format esm --platform node -d .tmp && node .tmp/chart-smoke.js",

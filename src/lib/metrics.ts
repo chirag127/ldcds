@@ -317,6 +317,18 @@ export const DIMENSIONS: Record<string, Dimension> = {
     get: (l) => band(l.score, [720, 740, 760, 780, 800], ['700–719', '720–739', '740–759', '760–779', '780–799', '800+']),
     order: ['700–719', '720–739', '740–759', '760–779', '780–799', '800+'],
   },
+  scoreFine: {
+    key: 'scoreFine',
+    label: 'LDC score (5-point)',
+    get: (l) => band(l.score, [705, 710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760, 765, 770, 775, 780], ['<705', '705–709', '710–714', '715–719', '720–724', '725–729', '730–734', '735–739', '740–744', '745–749', '750–754', '755–759', '760–764', '765–769', '770–774', '775–779', '780+']),
+    order: ['<705', '705–709', '710–714', '715–719', '720–724', '725–729', '730–734', '735–739', '740–744', '745–749', '750–754', '755–759', '760–764', '765–769', '770–774', '775–779', '780+'],
+  },
+  emiBand: {
+    key: 'emiBand',
+    label: 'Monthly EMI',
+    get: (l) => band(l.emi, [1001, 2001, 4001, 6001], ['≤₹1,000', '₹1,001–2,000', '₹2,001–4,000', '₹4,001–6,000', '₹6,000+ / missing']),
+    order: ['≤₹1,000', '₹1,001–2,000', '₹2,001–4,000', '₹4,001–6,000', '₹6,000+ / missing'],
+  },
   bureauBand: {
     key: 'bureauBand',
     label: 'Bureau score',
@@ -423,6 +435,43 @@ export interface SegmentStat {
   share: number;
   repeatShare: number;
   avgHoldingDays: number;
+  /** Defaults per 1,000 loan-months at risk (closed loans only). */
+  npaPer1000LoanMonths: number;
+  /** Monthly default rate in percent, and its ×12 annualised version. */
+  monthlyNpaRate: number;
+  annualisedNpaRate: number;
+  /** Rupees lost per ₹1,000 of principal per month at risk, and its ×12. */
+  lossPer1000RupeeMonths: number;
+  annualisedLossPer1000: number;
+  loanMonths: number;
+  /** Realised profit ÷ (principal × days held), annualised. */
+  capitalTime: number;
+  /** Realised profit as a share of principal. */
+  per100: number;
+}
+
+/** Exposure-adjusted stats for one group of loans, spread into a segment. */
+function hazardOf(group: Loan[]): Pick<SegmentStat, 'npaPer1000LoanMonths' | 'monthlyNpaRate' | 'annualisedNpaRate' | 'lossPer1000RupeeMonths' | 'annualisedLossPer1000' | 'loanMonths' | 'capitalTime' | 'per100'> {
+  const closed = group.filter(isClosed);
+  const loanMonths = sum(closed, (l) => (l.holdingDays > 0 ? l.holdingDays : l.vintageDays) / 30.44);
+  const npa = closed.filter(isNpa).length;
+  const per1000 = loanMonths ? (npa / loanMonths) * 1000 : 0;
+  const rupeeMonths = sum(closed, (l) => l.amount * ((l.holdingDays > 0 ? l.holdingDays : l.vintageDays) / 30.44));
+  const loss = sum(closed, (l) => l.npaAmount || 0);
+  const lossPer1000 = rupeeMonths ? (loss / rupeeMonths) * 1000 : 0;
+  const lent = sum(closed, (l) => l.amount);
+  const profit = sum(closed, (l) => l.netProfit);
+  const capitalDays = sum(closed, (l) => l.amount * l.holdingDays);
+  return {
+    npaPer1000LoanMonths: round(per1000, 2),
+    monthlyNpaRate: round(per1000 / 10, 2),
+    annualisedNpaRate: round((per1000 / 10) * 12, 1),
+    lossPer1000RupeeMonths: round(lossPer1000, 2),
+    annualisedLossPer1000: round(lossPer1000 * 12, 1),
+    loanMonths: round(loanMonths, 2),
+    capitalTime: capitalDays ? round((profit / capitalDays) * 365 * 100, 2) : 0,
+    per100: lent ? round((profit / lent) * 100, 2) : 0,
+  };
 }
 
 export interface CategoryOptions {
@@ -501,6 +550,9 @@ export function categoryStats(
       share: totalLent ? round((lent / totalLent) * 100, 2) : 0,
       repeatShare: group.length ? round((group.filter((l) => l.repeatCount > 1).length / group.length) * 100, 2) : 0,
       avgHoldingDays: round(mean(group, (l) => l.holdingDays), 1),
+      // Exposure-adjusted risk: defaults and losses per month at risk, so a
+      // 2-month loan and a 12-month loan sit on the same clock.
+      ...hazardOf(group),
     });
   }
   const filtered = options.minN ? stats.filter((s) => s.n >= options.minN!) : stats;
@@ -927,6 +979,17 @@ export interface ScoredLoan {
   reasons: string[];
 }
 
+/**
+ * Map a raw class-balanced scorecard output onto a real default probability.
+ * The training weights balanced the classes, so the raw score sits near a 39%
+ * prior; the Platt pair restores the book's true base rate.
+ */
+export function calibratePd(rawPd: number, platt: { a: number; b: number }): number {
+  const p = Math.min(0.999999, Math.max(1e-9, rawPd));
+  const z = Math.log(p / (1 - p));
+  return 1 / (1 + Math.exp(-clamp(platt.a * z + platt.b, -30, 30)));
+}
+
 export function scoreLoan(
   loan: Loan,
   model: ModelData,
@@ -961,7 +1024,11 @@ export function scoreLoan(
     const x = clamp((v - coef.mean) / (coef.std || 1), -6, 6);
     z += coef.coef * x;
   }
-  const pd = 1 / (1 + Math.exp(-clamp(z, -30, 30)));
+  const rawPd = 1 / (1 + Math.exp(-clamp(z, -30, 30)));
+  // The scorecard is trained with class-balanced weights, so its raw score is
+  // not a probability. Platt scaling (fitted on out-of-fold predictions) puts
+  // it back on the book's real base rate.
+  const pd = model.platt ? calibratePd(rawPd, model.platt) : rawPd;
   const adjusted = clamp(pd * (options.strictness ?? 1), 0.001, 0.95);
   const interest = loan.amount * (loan.rate / 100) * (loan.tenure / 12);
   const expectedProfit = interest * (1 - adjusted) - loan.amount * adjusted * model.lgd;

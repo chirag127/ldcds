@@ -1662,6 +1662,251 @@ input[type='range']::-moz-range-thumb {
   flex-wrap: wrap;
 }
 
+/* ---------------------------------------------------------- funding board */
+.fund-board {
+  gap: 14px;
+}
+
+/* ----------------------------------------------------------- policy board */
+.policy-board {
+  gap: 14px;
+}
+
+.policy-summary {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--emerald);
+  border-radius: 8px;
+  background: rgba(46, 230, 167, 0.06);
+  font-size: 12.5px;
+  color: #d7e3f0;
+  font-family: var(--mono);
+}
+
+.policy-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.policy-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.policy-control > span {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.policy-controls p {
+  flex: 1 1 260px;
+  margin: 0;
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.seg button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11.5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+
+.seg button + button {
+  border-left: 1px solid var(--line);
+}
+
+.seg button.on {
+  background: rgba(46, 230, 167, 0.16);
+  color: var(--emerald);
+}
+
+.rule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 10px;
+  counter-reset: rule;
+}
+
+.rule-list li {
+  display: flex;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.035);
+}
+
+.rule-list li.gate {
+  border-color: rgba(251, 113, 133, 0.35);
+  background: rgba(251, 113, 133, 0.05);
+}
+
+.rule-n {
+  flex: 0 0 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(34, 211, 238, 0.14);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rule-body {
+  min-width: 0;
+}
+
+.rule-body h4 {
+  margin: 0 0 4px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #e6edf6;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rule-tag {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rose);
+  border: 1px solid rgba(251, 113, 133, 0.4);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.rule-action {
+  margin: 0 0 4px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--emerald);
+}
+
+.rule-why {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #a9b8cb;
+}
+
+.rule-meta {
+  margin: 0;
+  font-size: 10.5px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.rule-impact {
+  color: var(--cyan);
+  font-family: var(--mono);
+}
+
+.fund-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.fund-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 940px;
+}
+
+.fund-table th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.fund-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.fund-table tr:last-child td {
+  border-bottom: none;
+}
+
+.fund-table tr.fund td:first-child {
+  box-shadow: inset 3px 0 0 var(--emerald);
+}
+
+.fund-table tr.watch td:first-child {
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.fund-table tr.skip td:first-child {
+  box-shadow: inset 3px 0 0 var(--rose);
+}
+
+.fund-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.points-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.points-bar {
+  display: inline-block;
+  width: 62px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.points-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--emerald));
+}
+
+.points-cell em {
+  font-style: normal;
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .lab {
   display: flex;
   flex-direction: column;

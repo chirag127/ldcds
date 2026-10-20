@@ -3,6 +3,8 @@ import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-d
 import { DataProvider, useStore } from './data/store';
 import { PAGES, chartCount } from './lib/pages';
 import { PageView } from './pages/PageView';
+import { Executive } from './pages/Executive';
+import { Policy } from './pages/Policy';
 import { Underwriting } from './pages/Underwriting';
 import { Explorer } from './pages/Explorer';
 import { Opportunities } from './pages/Opportunities';
@@ -59,7 +61,11 @@ function Layout() {
                 key={page.id}
                 path={`/${page.id}`}
                 element={
-                  page.custom === 'underwriting' ? (
+                  page.custom === 'executive' ? (
+                    <Executive page={page} />
+                  ) : page.custom === 'policy' ? (
+                    <Policy page={page} />
+                  ) : page.custom === 'underwriting' ? (
                     <Underwriting page={page} />
                   ) : page.custom === 'explorer' ? (
                     <Explorer page={page} />

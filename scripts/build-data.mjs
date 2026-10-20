@@ -896,25 +896,72 @@ const testLabels = testIdx.map((i) => y[i]);
 const testAuc = auc(testScores, testLabels);
 const testKs = ks(testScores, testLabels);
 const predAt50 = testScores.map((p) => (p >= 0.5 ? 1 : 0));
-const tp = predAt50.reduce((s, p, i) => s + (p && testLabels[i] ? 1 : 0), 0);
-const fp = predAt50.reduce((s, p, i) => s + (p && !testLabels[i] ? 1 : 0), 0);
-const fn = predAt50.reduce((s, p, i) => s + (!p && testLabels[i] ? 1 : 0), 0);
-const tn = predAt50.length - tp - fp - fn;
-const precision = tp + fp ? tp / (tp + fp) : 0;
-const recall = tp + fn ? tp / (tp + fn) : 0;
-const logLoss = -testScores.reduce((s, p, i) => s + (testLabels[i] ? Math.log(Math.max(p, 1e-9)) : Math.log(Math.max(1 - p, 1e-9))), 0) / testScores.length;
-const brier = testScores.reduce((s, p, i) => s + (p - testLabels[i]) ** 2, 0) / testScores.length;
+let tp = predAt50.reduce((s, p, i) => s + (p && testLabels[i] ? 1 : 0), 0);
+let fp = predAt50.reduce((s, p, i) => s + (p && !testLabels[i] ? 1 : 0), 0);
+let fn = predAt50.reduce((s, p, i) => s + (!p && testLabels[i] ? 1 : 0), 0);
+let tn = predAt50.length - tp - fp - fn;
+let precision = tp + fp ? tp / (tp + fp) : 0;
+let recall = tp + fn ? tp / (tp + fn) : 0;
+let logLoss = -testScores.reduce((s, p, i) => s + (testLabels[i] ? Math.log(Math.max(p, 1e-9)) : Math.log(Math.max(1 - p, 1e-9))), 0) / testScores.length;
+let brier = testScores.reduce((s, p, i) => s + (p - testLabels[i]) ** 2, 0) / testScores.length;
 
 // 5-fold cross-validation AUC (shorter training for speed).
 const cvAucs = [];
+const oofScores = new Array(modelRows.length).fill(null);
 for (let fold = 0; fold < 5; fold += 1) {
   const tr = [];
   const te = [];
   modelRows.forEach((r, i) => (foldOf(r.id) === fold ? te : tr).push(i));
   if (!te.length || !tr.some((i) => y[i]) || !te.some((i) => y[i])) continue;
-  const m = trainLogistic(tr, { epochs: 700, lr: 0.1, l2: 0.8 });
-  cvAucs.push(auc(te.map((i) => predictAt(m, i)), te.map((i) => y[i])));
+  const m = trainLogistic(tr, { epochs: 2600, lr: 0.08, l2: 0.6 });
+  const foldScores = te.map((i) => predictAt(m, i));
+  cvAucs.push(auc(foldScores, te.map((i) => y[i])));
+  te.forEach((i, k) => { oofScores[i] = foldScores[k]; });
 }
+
+// Platt calibration. Training used class-balanced weights so the model ranks
+// well, but that inflates raw probabilities (the balanced prior is ~39% vs a
+// true base rate of ~8%). Platt scaling maps the score onto the real rate
+// without changing the ranking.
+const logit = (p) => Math.log(Math.max(p, 1e-9) / Math.max(1 - p, 1e-9));
+function fitPlatt(xs, labels, { epochs = 5000, lr = 0.05 } = {}) {
+  let a = 1;
+  let b = 0;
+  const n = xs.length || 1;
+  for (let epoch = 0; epoch < epochs; epoch += 1) {
+    let ga = 0;
+    let gb = 0;
+    for (let i = 0; i < n; i += 1) {
+      if (xs[i] === null || !Number.isFinite(xs[i])) continue;
+      const p = sigmoid(a * xs[i] + b);
+      const err = p - labels[i];
+      ga += err * xs[i];
+      gb += err;
+    }
+    a -= (lr * ga) / n;
+    b -= (lr * gb) / n;
+  }
+  return { a: round(a, 6), b: round(b, 6) };
+}
+const platt = fitPlatt(oofScores.map((p) => (p === null ? null : logit(p))), y);
+const calibrate = (p) => (p === null ? null : sigmoid(platt.a * logit(p) + platt.b));
+const calibratedTestScores = testScores.map((p) => calibrate(p) ?? p);
+const meanPredicted = round(calibratedTestScores.reduce((s, p) => s + p, 0) / calibratedTestScores.length, 4);
+const meanActual = round(testLabels.reduce((s, v) => s + v, 0) / testLabels.length, 4);
+logLoss = -calibratedTestScores.reduce((s, p, i) => s + (testLabels[i] ? Math.log(Math.max(p, 1e-9)) : Math.log(Math.max(1 - p, 1e-9))), 0) / calibratedTestScores.length;
+brier = calibratedTestScores.reduce((s, p, i) => s + (p - testLabels[i]) ** 2, 0) / calibratedTestScores.length;
+
+// Classification metrics are reported on the calibrated probability at a 10%
+// default threshold — the base rate is ~8%, so 0.5 would flag a third of the
+// book as bad.
+const decisionThreshold = 0.1;
+const predFlag = calibratedTestScores.map((p) => (p >= decisionThreshold ? 1 : 0));
+tp = predFlag.reduce((s, p, i) => s + (p && testLabels[i] ? 1 : 0), 0);
+fp = predFlag.reduce((s, p, i) => s + (p && !testLabels[i] ? 1 : 0), 0);
+fn = predFlag.reduce((s, p, i) => s + (!p && testLabels[i] ? 1 : 0), 0);
+tn = predFlag.length - tp - fp - fn;
+precision = tp + fp ? tp / (tp + fp) : 0;
+recall = tp + fn ? tp / (tp + fn) : 0;
 
 // ROC, lift, calibration.
 const roc = [];
@@ -953,8 +1000,8 @@ const lift = [];
 }
 const calibration = [];
 {
-  const size = Math.ceil(testScores.length / 10);
-  const order = testScores.map((s, i) => [s, testLabels[i]]).sort((a, b) => a[0] - b[0]);
+  const size = Math.ceil(calibratedTestScores.length / 10);
+  const order = calibratedTestScores.map((s, i) => [s, testLabels[i]]).sort((a, b) => a[0] - b[0]);
   for (let b = 0; b < 10; b += 1) {
     const slice = order.slice(b * size, (b + 1) * size);
     if (!slice.length) break;
@@ -1053,7 +1100,7 @@ function predictRow(loan) {
     const x = clamp((raw - means[j]) / stds[j], -6, 6);
     z += finalModel.w[j] * x;
   });
-  return sigmoid(z);
+  return sigmoid(platt.a * logit(sigmoid(z)) + platt.b);
 }
 
 // Policy grid (in-sample; illustrative).
@@ -1157,6 +1204,7 @@ const model = {
   roc,
   lift,
   calibration,
+  platt: { ...platt, meanPredicted, meanActual, baseRate: round(y.reduce((s, v) => s + v, 0) / y.length, 4), threshold: decisionThreshold },
   woe,
   lgd: LGD,
   recoveryRate: RECOVERY_RATE,
@@ -1168,6 +1216,7 @@ const model = {
     'AUC around 0.60–0.65 is typical for thin-file consumer credit; treat this as directional, not production-grade.',
     'Policy grid is in-sample and ignores approval elasticity, concentration limits and seasonality.',
     'Features are standardised; coefficients are log-odds per 1 standard deviation.',
+    'Training used class-balanced weights, so raw scores are not probabilities. Platt scaling on out-of-fold predictions maps them onto the real base rate — always read the calibrated number.',
   ],
 };
 

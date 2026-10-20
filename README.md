@@ -1,7 +1,7 @@
 # LenDenClub loan book analytics
 
 A static, public analytics site for a personal LenDenClub P2P loan book:
-5,567 loans, ₹33.14 lakh deployed, 16 tabs and 488 charts. Every chart has a
+5,567 loans, ₹33.14 lakh deployed, 18 tabs and 530 charts. Every chart has a
 written insight card that says which loans to prefer or avoid. Filters,
 scenario assumptions, the underwriting lab and the loan explorer all run in
 the browser — there is no backend.
@@ -19,6 +19,8 @@ the browser — there is no backend.
 | Tab | What it answers |
 | --- | --- |
 | Executive | Book size, profit, NPA, prepayment, coverage, forward view |
+| **Best** | 🏆 Which loans to give and which to leave alone: 42 charts ranking NPA, annualised risk, loss severity, capital-time return and profit per ₹100 across every dimension |
+| **Policy** | 📜 Twenty rules for the next bid — give this, not that — each with the evidence behind it and a replay of the policy on the closed book |
 | Portfolio | Outcome mix, vintage, ticket sizes, concentration, data quality |
 | Returns | Platform ANR vs capital-time annualisation vs XIRR, and why they differ |
 | Active book | Outstanding principal, maturity ladder, overdue active, forward interest |
@@ -96,6 +98,35 @@ Four definitions are shown side by side instead of picking one.
 percentage above 400% or an XIRR above 1500%. ANR charts exclude NPA loans:
 their reported ANR is a write-off (as low as -600%), not a return.
 
+### Reading risk on one clock
+
+Raw NPA counts punish long tenures and flatter short ones: a 12-month loan has
+four times as much time to default as a 3-month loan. `src/lib/hazard.ts` and
+the `hazard*` metrics put everything on a common clock:
+
+| Measure | Meaning |
+| --- | --- |
+| `npaPer1000LoanMonths` | defaults per 1,000 loan-months at risk (closed loans) |
+| `annualisedNpaRate` | monthly default rate × 12 |
+| `lossPer1000RupeeMonths` | rupees lost per ₹1,000 of principal per month at risk |
+| `annualisedLossPer1000` | that figure × 12 |
+| `capitalTime` | realised profit ÷ (principal × days held), annualised |
+
+Every ranking chart on the **Best** tab shows raw NPA beside the annualised rate,
+and the seasoning chart plots cumulative NPA as each cohort ages, so a 2-month
+loan and a 12-month loan are compared fairly. The policy thresholds come from
+the exposure-adjusted numbers, not the raw counts.
+
+### The twenty rules
+
+`src/lib/policy.ts` derives twenty criteria from the book itself. Each one
+states the action, the evidence behind it, the measured impact and the sample
+behind that impact, and carries the check that decides it. Three presets
+(wide / core / strict) combine subsets of them, and `backtestPolicy()` replays
+each preset over the closed book so the approval rate, NPA rate and return are
+visible before you commit. The rules are guidance — they are not applied to any
+live loan.
+
 ### Scenarios
 
 | Scenario | Treatment of impaired active loans |
@@ -116,9 +147,9 @@ npm run build        # tsc -b && vite build
 npm run preview
 npm run data:verify  # integrity + privacy checks on public/data
 npm run data:build   # rebuild public/data from data/raw (requires raw exports)
-npm run charts:count # per-tab chart inventory (expect 488)
+npm run charts:count # per-tab chart inventory (expect 530)
 npm run charts:dupes # duplicate chart id check
-npm run charts:smoke # build all 488 charts × 3 scenarios headlessly
+npm run charts:smoke # build all 530 charts × 3 scenarios headlessly
 npm run charts:audit # fail on implausible percentages (unit-bug guard)
 ```
 
@@ -148,7 +179,7 @@ src/
     stats.ts              statistics, XIRR, regression, sampling
     charts.ts             ECharts option builders
     chart-kit.ts          chart factories used by page configs
-    pages.ts              16 page definitions / 488 chart specs
+    pages.ts              18 page definitions / 530 chart specs
     insights.ts           insight + ranking generators
     filters.ts            filter model, serialisation, presets
     format.ts             INR, percent, date formatters
@@ -175,7 +206,7 @@ categorical inclusion and flags. Scenario choice is part of the view state.
 ## Deployment
 
 `.github/workflows/deploy.yml` runs the dataset checks and a headless build of
-all 488 charts, then builds on every push to `main` and publishes `dist/`
+all 530 charts, then builds on every push to `main` and publishes `dist/`
 through GitHub Pages. The Vite `base` is `./` and the app uses
 `HashRouter`, so deep links work under `/ldcds/` without server rewrites.
 `public/.nojekyll` prevents Jekyll from dropping hashed asset folders.

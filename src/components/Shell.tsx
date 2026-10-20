@@ -5,13 +5,35 @@ import { useStore } from '../data/store';
 import { num } from '../lib/format';
 import { PRESETS } from '../lib/filters';
 
-const GROUPS: { label: string; ids: string[] }[] = [
-  { label: 'Command', ids: ['executive'] },
-  { label: 'The book', ids: ['portfolio', 'returns', 'active', 'npa'] },
-  { label: 'Risk', ids: ['risk', 'scorecard', 'tenure', 'geography', 'cohorts', 'borrowers', 'fees'] },
-  { label: 'Labs', ids: ['underwriting', 'opportunities', 'explorer'] },
-  { label: 'Reference', ids: ['methodology'] },
+const GROUPS: { label: string; emoji: string; ids: string[] }[] = [
+  { label: 'Command', emoji: '🎛️', ids: ['executive'] },
+  { label: 'Decide', emoji: '🏆', ids: ['best', 'policy'] },
+  { label: 'The book', emoji: '📚', ids: ['portfolio', 'returns', 'active', 'npa'] },
+  { label: 'Risk', emoji: '⚠️', ids: ['risk', 'scorecard', 'tenure', 'geography', 'cohorts', 'borrowers', 'fees'] },
+  { label: 'Labs', emoji: '🧪', ids: ['underwriting', 'opportunities', 'explorer'] },
+  { label: 'Reference', emoji: '📖', ids: ['methodology'] },
 ];
+
+const EMOJI: Record<string, string> = {
+  executive: '📊',
+  best: '🏆',
+  policy: '📜',
+  portfolio: '🗂️',
+  returns: '💹',
+  active: '📈',
+  npa: '🚨',
+  risk: '🛡️',
+  scorecard: '🎯',
+  tenure: '⏳',
+  geography: '🗺️',
+  cohorts: '🧬',
+  borrowers: '👥',
+  fees: '🧾',
+  underwriting: '⚖️',
+  opportunities: '🛒',
+  explorer: '🔍',
+  methodology: '📐',
+};
 
 const SCENARIOS = [
   { id: 'contractual', label: 'Contractual' },
@@ -36,7 +58,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         <nav>
           {GROUPS.map((group) => (
             <div className="nav-group" key={group.label}>
-              <span className="nav-label">{group.label}</span>
+              <span className="nav-label">{group.emoji} {group.label}</span>
               {group.ids.map((id) => {
                 const page = PAGES.find((p) => p.id === id);
                 if (!page) return null;
@@ -48,7 +70,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                     className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                     onClick={onClose}
                   >
-                    <span>{page.title}</span>
+                    <span>{EMOJI[id] ?? '•'} {page.title}</span>
                     <em>{count}</em>
                   </NavLink>
                 );

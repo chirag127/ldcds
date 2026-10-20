@@ -45,7 +45,11 @@ export function Methodology({ page }: { page: PageConfig }) {
         </p>
         <p>
           It is an education and research project, not investment advice. Historical NPA does not predict the next default, and a
-          scorecard trained on {num(model.observations)} closed loans is a ranking tool, not a credit policy.
+          scorecard trained on {num(model.observations)} closed loans is a ranking tool, not a credit policy. Its training weights
+          balanced the classes, so the raw output is not a probability; every default rate shown on this site is rescaled with
+          Platt mapping fitted on out-of-fold predictions, which moves the mean predicted rate from{' '}
+          {pct(model.platt.baseRate * 100)} base rate to {pct(model.platt.meanPredicted * 100)} against an observed{' '}
+          {pct(model.platt.meanActual * 100)}.
         </p>
 
         <h2>Pipeline</h2>

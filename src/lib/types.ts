@@ -306,6 +306,8 @@ export interface ModelData {
   roc: { fpr: number; tpr: number }[];
   lift: { decile: number; count: number; bad: number; badRate: number; lift: number; avgScore: number }[];
   calibration: { bin: number; predicted: number; actual: number; count: number }[];
+  /** Platt mapping from the class-balanced scorecard onto real default rates. */
+  platt: { a: number; b: number; meanPredicted: number; meanActual: number; baseRate: number; threshold: number };
   woe: WoeGroup[];
   lgd: number;
   recoveryRate: number;
@@ -428,5 +430,5 @@ export interface PageConfig {
   description: string;
   heroKpis: (rows: Loan[], ctx: ViewContext) => { label: string; value: string; delta?: string; hint?: string; tone?: 'good' | 'bad' | 'neutral' }[];
   sections: { id: string; title: string; description?: string; charts: ChartSpec[] }[];
-  custom?: 'underwriting' | 'explorer' | 'methodology' | 'opportunities';
+  custom?: 'underwriting' | 'explorer' | 'methodology' | 'opportunities' | 'executive' | 'policy';
 }

@@ -86,6 +86,11 @@ export const METRICS: Record<string, MetricDef> = {
   share: { label: 'capital share', kind: 'percent', higherIsBetter: true, get: (s) => s.share },
   ciHigh: { label: 'bad-rate upper bound', kind: 'percent', higherIsBetter: false, get: (s) => s.ciHigh, risk: true },
   medianAnr: { label: 'median ANR', kind: 'percent', higherIsBetter: true, get: (s) => s.medianAnr },
+  hazard: { label: 'defaults per 1,000 loan-months', kind: 'num', higherIsBetter: false, get: (s) => s.npaPer1000LoanMonths, risk: true },
+  hazardAnnual: { label: 'annualised default rate', kind: 'percent', higherIsBetter: false, get: (s) => s.annualisedNpaRate, risk: true },
+  lossRate: { label: 'loss per ₹1,000 lent-month', kind: 'num', higherIsBetter: false, get: (s) => s.lossPer1000RupeeMonths, risk: true },
+  capitalTime: { label: 'capital-time return', kind: 'percent', higherIsBetter: true, get: (s) => s.capitalTime },
+  per100: { label: 'profit per ₹100 lent', kind: 'percent', higherIsBetter: true, get: (s) => s.per100 },
 };
 
 export type MetricKey = keyof typeof METRICS;
@@ -1429,8 +1434,115 @@ export function topBorrowersTable(o: { id: string; title: string; section: strin
   );
 }
 
-export function xirrSpread(o: { id: string; title: string; section: string; span?: 2 }): ChartSpec {
+// ---------------------------------------------------------------------------
+// Exposure-adjusted risk: raw NPA beside the annualised rate
+// ---------------------------------------------------------------------------
+export function hazardBars(o: { id: string; title: string; section: string; dim: string; span?: 1 | 2 }): ChartSpec {
   return chart(
+    o.id,
+    o.title,
+    o.section,
+    (rows): ChartResult => {
+      const stats = categoryStats(rows, 'recovery', DIMENSIONS[o.dim], 0.45, { sortBy: 'n', minN: 20 });
+      const option = barOption({
+        categories: stats.map((s) => s.label),
+        series: [
+          { name: 'Raw NPA %', data: stats.map((s) => s.npaRate), color: COLORS.rose },
+          { name: 'Annualised default rate %', data: stats.map((s) => s.annualisedNpaRate), color: COLORS.amber },
+        ],
+        yFormat: 'percent',
+      });
+      const worst = [...stats].sort((a, b) => b.annualisedNpaRate - a.annualisedNpaRate)[0];
+      const rawWorst = [...stats].sort((a, b) => b.npaRate - a.npaRate)[0];
+      const flip = worst && rawWorst && worst.label !== rawWorst.label;
+      return {
+        option,
+        insight: plain(
+          worst && worst.annualisedNpaRate > 20 ? 'warning' : 'neutral',
+          `Worst bucket: ${worst?.label ?? '—'} at ${worst?.annualisedNpaRate ?? 0}% a year`,
+          `Raw NPA points at ${rawWorst?.label ?? '—'} (${rawWorst?.npaRate ?? 0}%), but the annualised rate points at ${worst?.label ?? '—'} (${worst?.annualisedNpaRate ?? 0}%)${flip ? ' — the ranking changes once time is accounted for, so trust the annualised number.' : '.'} Defaults per 1,000 loan-months: ${stats.map((s) => `${s.label} ${s.npaPer1000LoanMonths}`).join(' · ')}`,
+          'AVOID',
+        ),
+      };
+    },
+    { subtitle: 'Raw NPA beside the same risk annualised to a common clock', span: o.span ?? 2, height: 300 },
+  );
+}
+
+export function hazardLine(o: { id: string; title: string; section: string; dim: string; span?: 2 }): ChartSpec {
+  return chart(
+    o.id,
+    o.title,
+    o.section,
+    (rows): ChartResult => {
+      const stats = categoryStats(rows, 'recovery', DIMENSIONS[o.dim], 0.45, { sortBy: 'n', minN: 20 });
+      const option = lineOption({
+        x: stats.map((s) => s.label),
+        series: [
+          { name: 'Defaults per 1,000 loan-months', data: stats.map((s) => s.npaPer1000LoanMonths), color: COLORS.rose, area: true },
+        ],
+        yFormat: 'num',
+        showLegend: false,
+      });
+      const worst = [...stats].sort((a, b) => b.npaPer1000LoanMonths - a.npaPer1000LoanMonths)[0];
+      const best = [...stats].sort((a, b) => a.npaPer1000LoanMonths - b.npaPer1000LoanMonths)[0];
+      const ratio = worst && best && best.npaPer1000LoanMonths > 0 ? Math.round(worst.npaPer1000LoanMonths / best.npaPer1000LoanMonths) : null;
+      return {
+        option,
+        insight: plain(
+          'neutral',
+          `Best to worst: ${ratio ? `${ratio}×` : '—'} spread across this dimension`,
+          `Lowest exposure risk is ${best?.label ?? '—'} at ${best?.npaPer1000LoanMonths ?? 0} defaults per 1,000 loan-months, highest is ${worst?.label ?? '—'} at ${worst?.npaPer1000LoanMonths ?? 0}. Each unit is a month of principal at risk — multiply by 12 for a year.`,
+          ratio && ratio >= 3 ? 'AVOID' : 'INFO',
+        ),
+      };
+    },
+    { subtitle: 'Defaults per 1,000 loan-months at risk', span: o.span ?? 2, height: 280 },
+  );
+}
+
+export function seasoningHazard(o: { id: string; title: string; section: string; span?: 2 | 3 }): ChartSpec {
+  return chart(
+    o.id,
+    o.title,
+    o.section,
+    (rows): ChartResult => {
+      const months = [...new Set(rows.map((l) => l.disbMonth))].sort().slice(-9);
+      const buckets = Array.from({ length: 9 }, (_, i) => Math.round((i + 1) * 30.44));
+      const series = months.map((month) => {
+        const group = rows.filter((l) => l.disbMonth === month);
+        const data = buckets.map((limit) => {
+          const inWindow = group.filter((l) => (l.status !== 0 ? l.holdingDays >= limit : l.vintageDays >= limit));
+          if (!inWindow.length) return null;
+          return round((inWindow.filter((l) => l.npa === 1).length / inWindow.length) * 100, 2);
+        });
+        return { name: month, data };
+      });
+      const option = lineOption({
+        x: buckets.map((b) => `${Math.round(b / 30.44)}M`),
+        series: series.map((s) => ({ ...s, data: s.data as (number | null)[] })),
+        yFormat: 'percent',
+        showLegend: months.length <= 5,
+      });
+      const seasoned = series.filter((s) => s.data.every((v) => v !== null));
+      const first = seasoned[0];
+      return {
+        option,
+        insight: plain(
+          'neutral',
+          `Cumulative default rate by seasoning month`,
+          first
+            ? `${first.name} reaches ${first.data[first.data.length - 1]}% NPA after ${Math.round(buckets[buckets.length - 1] / 30.44)} months; ${seasoned.length} cohorts are fully observable. This is the only honest way to compare a 2-month loan with a 12-month one — raw NPA by cohort always favours the short one.`
+            : 'No fully observable cohort in this slice.',
+          'INFO',
+        ),
+      };
+    },
+    { subtitle: 'Cumulative NPA as each cohort ages, per seasoning month', span: o.span ?? 2, height: 300 },
+  );
+}
+
+export function xirrSpread(o: { id: string; title: string; section: string; span?: 2 }): ChartSpec {  return chart(
     o.id,
     o.title,
     o.section,

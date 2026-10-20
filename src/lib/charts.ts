@@ -102,7 +102,7 @@ export function axisY(extra: Record<string, unknown> = {}) {
 
 export interface BarSeries {
   name: string;
-  data: (number | null)[];
+  data: (number | null | { value: number; itemStyle?: { color: string }; name?: string })[];
   color?: string;
   stack?: string;
   type?: 'bar' | 'line';
@@ -125,11 +125,14 @@ export interface BarOptions {
 
 function valueFormatter(kind?: string) {
   return (value: unknown) => {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
-    if (kind === 'money') return inrCompact(value);
-    if (kind === 'percent') return pct(value);
-    if (kind === 'ratio') return pct(value * 100);
-    return num(value);
+    const v = typeof value === 'object' && value !== null && 'value' in value
+      ? (value as { value: unknown }).value
+      : value;
+    if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
+    if (kind === 'money') return inrCompact(v);
+    if (kind === 'percent') return pct(v);
+    if (kind === 'ratio') return pct(v * 100);
+    return num(v);
   };
 }
 
@@ -184,7 +187,10 @@ export function barOption({
             position: horizontal ? 'right' : 'top',
             color: '#cbd5e1',
             fontSize: 9,
-            formatter: (p: { value: number }) => (yFormat === 'money' ? inrCompact(p.value) : yFormat === 'percent' ? `${p.value}%` : num(p.value)),
+            formatter: (p: { value: number | { value: number } }) => {
+              const v = typeof p.value === 'object' && p.value !== null ? p.value.value : (p.value as number);
+              return yFormat === 'money' ? inrCompact(v) : yFormat === 'percent' ? `${v}%` : num(v);
+            },
           }
         : undefined,
       emphasis: { focus: 'series' },
